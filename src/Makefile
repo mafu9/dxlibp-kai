@@ -50,7 +50,8 @@ OBJS += input/checkhitkey.o
 OBJS += input/gethitkeystateall.o
 
 #math functions
-#dxlibp.hに蜀・�E��E�をinline化して移してあります。コード保守縺Eために遺してあるソースなので消さなぁE〒ください、E#OBJS += math/vector.c
+#dxlibp.hに内容をinline化して移してあります。コード保守のために遺してあるソースなので消さないでください。
+#OBJS += math/vector.c
 #OBJS += math/matrix.c
 
 #graphics functions
