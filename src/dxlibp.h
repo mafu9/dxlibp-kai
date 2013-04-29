@@ -1558,7 +1558,7 @@ void *GetDisplaybufferAddress(void);
 /**
  * 音楽データを読み込みます(本家互換)
  * 
- * MP3、WAV(PCM)、AT3形式の音楽ファイルのみ読み込めます。なお、読み込み作業は別スレッドで行われます。
+ * MP3、OGG、WAV(PCM)、AT3形式の音楽ファイルのみ読み込めます。なお、読み込み作業は別スレッドで行われます。
  *
  * @param filename ファイル名
  * @return サウンドハンドル

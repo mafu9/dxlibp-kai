@@ -7,6 +7,9 @@ int dxpSoundCodecInit(DXPSOUNDHANDLE *pHnd)
 
 	status = dxpSoundMp3Init(&pHnd->avContext);
 	if ( !(status < 0) ) return 0;
+
+	status = dxpSoundOggInit(&pHnd->avContext);
+	if ( !(status < 0) ) return 0;
 	
 	status = dxpSoundAt3Init(&pHnd->avContext);
 	if ( !(status < 0) ) return 0;
@@ -24,6 +27,8 @@ int dxpSoundCodecGetSampleLength(DXPSOUNDHANDLE *pHnd)
 	switch ( pHnd->avContext.format ) {
 	case DXP_SOUNDFMT_MP3:
 		return dxpSoundMp3GetSampleLength(&pHnd->avContext);
+	case DXP_SOUNDFMT_OGG:
+		return dxpSoundOggGetSampleLength(&pHnd->avContext);
 	case DXP_SOUNDFMT_AT3:
 		return dxpSoundAt3GetSampleLength(&pHnd->avContext);
 	case DXP_SOUNDFMT_WAV:
@@ -39,6 +44,8 @@ int dxpSoundCodecSeek(DXPSOUNDHANDLE *pHnd, int sample)
 	switch ( pHnd->avContext.format ) {
 	case DXP_SOUNDFMT_MP3:
 		return dxpSoundMp3Seek(&pHnd->avContext,sample);
+	case DXP_SOUNDFMT_OGG:
+		return dxpSoundOggSeek(&pHnd->avContext,sample);
 	case DXP_SOUNDFMT_AT3:
 		return dxpSoundAt3Seek(&pHnd->avContext,sample);
 	case DXP_SOUNDFMT_WAV:
@@ -54,6 +61,8 @@ int dxpSoundCodecDecode(DXPSOUNDHANDLE *pHnd)
 	switch ( pHnd->avContext.format ) {
 	case DXP_SOUNDFMT_MP3:
 		return dxpSoundMp3Decode(&pHnd->avContext);
+	case DXP_SOUNDFMT_OGG:
+		return dxpSoundOggDecode(&pHnd->avContext);
 	case DXP_SOUNDFMT_AT3:
 		return dxpSoundAt3Decode(&pHnd->avContext);
 	case DXP_SOUNDFMT_WAV:
@@ -69,6 +78,8 @@ int dxpSoundCodecEnd(DXPSOUNDHANDLE *pHnd)
 	switch ( pHnd->avContext.format ) {
 	case DXP_SOUNDFMT_MP3:
 		return dxpSoundMp3End(&pHnd->avContext);
+	case DXP_SOUNDFMT_OGG:
+		return dxpSoundOggEnd(&pHnd->avContext);
 	case DXP_SOUNDFMT_AT3:
 		return dxpSoundAt3End(&pHnd->avContext);
 	case DXP_SOUNDFMT_WAV:

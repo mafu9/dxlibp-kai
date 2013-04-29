@@ -3,6 +3,7 @@
 #include <psputility.h>
 #include <psptypes.h>
 #include <pspaudio.h>
+#include <tremor/ivorbisfile.h>
 
 #define DXP_BUILDOPTION_SOUNDHANDLE_MAX 32
 
@@ -12,8 +13,9 @@
 #define DXP_SOUNDCMD_EXIT 3
 
 #define DXP_SOUNDFMT_MP3 1
-#define DXP_SOUNDFMT_AT3 2
-#define DXP_SOUNDFMT_WAV 3
+#define DXP_SOUNDFMT_OGG 2
+#define DXP_SOUNDFMT_AT3 3
+#define DXP_SOUNDFMT_WAV 4
 
 /* Wave formats */
 #define WAVE_FORMAT_PCM			0x0001
@@ -54,6 +56,10 @@ typedef struct _DXPAVCONTEXT_MP3 {
 	u8 *mp3Buf;
 	u32 mp3BufSize;
 } DXPAVCONTEXT_MP3 ;
+
+typedef struct _DXPAVCONTEXT_OGG {
+	OggVorbis_File *file;
+} DXPAVCONTEXT_OGG ;
 
 typedef struct _DXPAVCONTEXT_AT3 {
 	/* デコード用のバッファ */
@@ -111,6 +117,7 @@ typedef struct DXPAVCONTEXT {
 
 	union {
 		DXPAVCONTEXT_MP3 mp3;
+		DXPAVCONTEXT_OGG ogg;
 		DXPAVCONTEXT_AT3 at3;
 		DXPAVCONTEXT_WAV wav;
 	};
@@ -173,6 +180,12 @@ int dxpSoundMp3GetSampleLength(DXPAVCONTEXT *av);
 int dxpSoundMp3Seek(DXPAVCONTEXT *av, int sample);
 int dxpSoundMp3Decode(DXPAVCONTEXT *av);
 int dxpSoundMp3End(DXPAVCONTEXT *av);
+
+int dxpSoundOggInit(DXPAVCONTEXT *av);
+int dxpSoundOggGetSampleLength(DXPAVCONTEXT *av);
+int dxpSoundOggSeek(DXPAVCONTEXT *av, int sample);
+int dxpSoundOggDecode(DXPAVCONTEXT *av);
+int dxpSoundOggEnd(DXPAVCONTEXT *av);
 
 int dxpSoundAt3Init(DXPAVCONTEXT *av);
 int dxpSoundAt3GetSampleLength(DXPAVCONTEXT *av);

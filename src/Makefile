@@ -149,19 +149,9 @@ OBJS += sound/sound.o
 OBJS += sound/soundcodec.o
 OBJS += sound/soundthread.o
 OBJS += sound/mp3.o
+OBJS += sound/ogg.o
 OBJS += sound/at3.o
 OBJS += sound/wav.o
-#OBJS += sound/initsoundmem.o
-#OBJS += sound/loadsoundmem.o
-#OBJS += sound/playsoundmem.o
-#OBJS += sound/checksoundmem.o
-#OBJS += sound/stopsoundmem.o
-#OBJS += sound/deletesoundmem.o
-#OBJS += sound/setlooppossoundmem.o
-#OBJS += sound/setloopsamplepossoundmem.o
-#OBJS += sound/changevolumesoundmem.o
-#OBJS += sound/setpansoundmem.o
-#OBJS += sound/setcreatesounddatatype.o
 
 #3d graphics functions
 OBJS += graphics/3d/3dgraphics.o
