@@ -174,7 +174,11 @@ int SwizzleGraph(int gh)
 	}
 	else
 	{
-		void *buf = malloc(size);
+		const int assertFlag = GetMemoryAssertFlag();
+		void *buf;
+		SetMemoryAssertFlag(FALSE);
+		buf = malloc(size);
+		SetMemoryAssertFlag(assertFlag);
 		if(!buf)return -1;
 		dxpGraphicsSwizzleFast(buf,texptr->texdata,PSM2BYTEX2(texptr->psm) * texptr->pitch / 2,texptr->height);
 		memcpy(texptr->texdata,buf,size);
@@ -203,7 +207,11 @@ int UnswizzleGraph(int gh)
 	}
 	else
 	{
-		void *buf = malloc(size);
+		const int assertFlag = GetMemoryAssertFlag();
+		void *buf;
+		SetMemoryAssertFlag(FALSE);
+		buf = malloc(size);
+		SetMemoryAssertFlag(assertFlag);
 		if(!buf)return -1;
 		dxpGraphicsUnswizzleFast(buf,texptr->texdata,PSM2BYTEX2(texptr->psm) * texptr->pitch / 2,texptr->height);
 		memcpy(texptr->texdata,buf,size);
