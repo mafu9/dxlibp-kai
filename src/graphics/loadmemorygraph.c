@@ -164,7 +164,7 @@ static DXPTEXTURE3* LoadMemoryJpegImage(void *buffer, unsigned int len)
 	int pitch = ((width + 3) >> 2) << 2;
 	int texwidth = AlignPow2(width);
 	int texheight = AlignPow2(height);
-	if ( width > 512 || width <= 0 || height > 512 || height <= 0 || cinfo.out_color_components == 1 ) goto err;
+	if ( width > 512 || width <= 0 || height > 512 || height <= 0 ) goto err;
 	int bufsize = pitch * texheight * 4;
 	
 	u8* data = (u8*)malloc(bufsize);
@@ -182,11 +182,23 @@ static DXPTEXTURE3* LoadMemoryJpegImage(void *buffer, unsigned int len)
 
 	for ( i = 0, y = 0; y < height; y++, i += (pitch - width) * 4 ) {
 		jpeg_read_scanlines(&cinfo, &linedata, 1);
-		for ( x = 0; x < width; x++ ) {
-			data[i++] = linedata[x * 3 + 0];
-			data[i++] = linedata[x * 3 + 1];
-			data[i++] = linedata[x * 3 + 2];
-			data[i++] = 0xFF;
+		if(cinfo.out_color_components == 3) // RGB
+		{
+			for ( x = 0; x < width; x++ ) {
+				data[i++] = linedata[x * 3 + 0];
+				data[i++] = linedata[x * 3 + 1];
+				data[i++] = linedata[x * 3 + 2];
+				data[i++] = 0xFF;
+			}
+		}
+		else // (cinfo.out_color_components == 1) // glayscale
+		{
+			for ( x = 0; x < width; x++ ) {
+				data[i++] = linedata[x];
+				data[i++] = linedata[x];
+				data[i++] = linedata[x];
+				data[i++] = 0xFF;
+			}
 		}
 	}
 	
