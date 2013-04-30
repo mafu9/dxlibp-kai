@@ -84,9 +84,9 @@ int dxpSoundThreadFunc_file(SceSize size,void* argp)
 			}
 		}
 	}
+	if(channel >= 0)sceAudioChRelease(channel);
 	free(pcmBuf[0]);
 	free(pcmBuf[1]);
-	if(channel >= 0)sceAudioChRelease(channel);
 	pHnd->file.threadId = -1;
 	pHnd->cmd = DXP_SOUNDCMD_NONE;
 	pHnd->playing = 0;
