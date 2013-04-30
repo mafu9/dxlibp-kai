@@ -25,6 +25,7 @@
 #define DXP_BUILDOPTION_6XX_SJISENCODING			//定義すると文字列描写においてFW6.XXでもSJISが使えるが、描写は遅くなる
 #define DXP_BUILDOPTION_USE_LIBPNG					//libpngを使用する
 #define DXP_BUILDOPTION_USE_LIBJPEG					//jpeglibを使用する
+#define DXP_BUILDOPTION_USE_LIBOGG					//liboggを使用する
 
 //#define DXP_BUILDOPTION_NO3D						//3D機能の無効化。これをコメントアウトした場合、実装途中の3D関数が使用可能になりますが、libpspgumへの依存が発生します。
 

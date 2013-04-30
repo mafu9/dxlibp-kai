@@ -23,7 +23,7 @@ To use this library,
 
 * DxLib_Init function must be called before malloc
 
-* libvorbisidec and libogg need to be linked
+* libvorbisidec and libogg need to be linked if DXP_BUILDOPTION_USE_LIBOGG is defined
 
 ```
 LIBS = dxlibp.a -lvorbisidec -logg -ljpeg -lpng -lpspgum -lpspgu -lz -lm -lpsprtc -lpspaudio -lpspaudiocodec -lpsputility -lpspvalloc -lpsppower
@@ -36,6 +36,8 @@ LDFLAGS = -Wl,--wrap,malloc -Wl,--wrap,realloc -Wl,--wrap,calloc -Wl,--wrap,mema
 ```
 
 * The following copyright needs to be added:
+
+if DXP_BUILDOPTION_USE_LIBOGG is defined:
 
 ```
 libogg and libvorbisidec

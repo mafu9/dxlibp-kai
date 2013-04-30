@@ -2,6 +2,7 @@
 #include <string.h>
 #include <malloc.h>
 
+#ifdef DXP_BUILDOPTION_USE_LIBOGG
 static size_t ogg_read_func(void *ptr, size_t size, size_t nmemb, void *datasource)
 {
 	int fh = *(int*)datasource;
@@ -24,9 +25,11 @@ static long ogg_tell_func(void *datasource)
 	int fh = *(int*)datasource;
 	return (long)FileRead_tell(fh);
 }
+#endif
 
 int dxpSoundOggInit(DXPAVCONTEXT *av)
 {
+#ifdef DXP_BUILDOPTION_USE_LIBOGG
 	ov_callbacks callbacks;
 	vorbis_info *vi;
 	int ret;
@@ -58,20 +61,28 @@ int dxpSoundOggInit(DXPAVCONTEXT *av)
 	av->outSampleNum = 1024;
 	av->format = DXP_SOUNDFMT_OGG;
 	return 0;
+#else
+	return -1;
+#endif
 }
 
 int dxpSoundOggSeek(DXPAVCONTEXT *av,int sample)
 {
+#ifdef DXP_BUILDOPTION_USE_LIBOGG
 	int ret;
 	if(av->format != DXP_SOUNDFMT_OGG)return -1;
 	ret = ov_pcm_seek(av->ogg.file,(ogg_int64_t)sample);
 	if(ret < 0)return -1;
 	av->nextPos = (int)ov_pcm_tell(av->ogg.file);
 	return 0;
+#else
+	return -1;
+#endif
 }
 
 int dxpSoundOggDecode(DXPAVCONTEXT *av)
 {
+#ifdef DXP_BUILDOPTION_USE_LIBOGG
 	int len = dxpSoundCalcBufferSize(av, dxpSoundGetNextSampleNum(av));
 //	int readbytes = 0;
 	int ret, bitstream;
@@ -93,22 +104,33 @@ int dxpSoundOggDecode(DXPAVCONTEXT *av)
 //	av->nextPos += readbytes / dxpSoundCalcBufferSize(av, 1);
 	av->nextPos = (int)ov_pcm_tell(av->ogg.file);
 	return 0;
+#else
+	return -1;
+#endif
 }
 
 int dxpSoundOggEnd(DXPAVCONTEXT *av)
 {
+#ifdef DXP_BUILDOPTION_USE_LIBOGG
 	if(av->format != DXP_SOUNDFMT_OGG)return -1;
 	ov_clear(av->ogg.file);
 	free(av->ogg.file);
 	return 0;
+#else
+	return -1;
+#endif
 }
 
 int dxpSoundOggGetSampleLength(DXPAVCONTEXT *av)
 {
+#ifdef DXP_BUILDOPTION_USE_LIBOGG
 	int len;
 	if(av->format != DXP_SOUNDFMT_OGG)return -1;
 	len = (int)ov_pcm_total(av->ogg.file, -1);
 	if(len == OV_EINVAL)return -1;
 	return len;
+#else
+	return -1;
+#endif
 }
 
