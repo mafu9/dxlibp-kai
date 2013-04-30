@@ -16,6 +16,7 @@ static int ogg_seek_func(void *datasource, ogg_int64_t offset, int whence)
 
 static int ogg_close_func(void *datasource)
 {
+	return 0;
 }
 
 static long ogg_tell_func(void *datasource)
