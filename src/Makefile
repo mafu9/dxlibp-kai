@@ -18,8 +18,11 @@ OBJS += general/sleep.o
 OBJS += general/setmultithreadflag.o
 OBJS += general/setalwaysrunflag.o
 
-#threadsafe alloc/free
-OBJS += safealloc/safealloc.o
+#memory functions
+OBJS += memory/memutils.o
+OBJS += memory/getmemoryfreesize.o
+OBJS += memory/getmemorytotalsize.o
+OBJS += memory/setmemoryassertflag.o
 
 #file io functions
 OBJS += fileio/fileio.o

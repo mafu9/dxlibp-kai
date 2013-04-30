@@ -3,7 +3,6 @@
 #include <string.h>
 #include <pspaudio.h>
 #include "../general.h"
-#include "../safealloc.h"
 
 int dxpSoundThreadFunc_file(SceSize size,void* argp)
 {
@@ -40,8 +39,8 @@ int dxpSoundThreadFunc_file(SceSize size,void* argp)
 			
 			//バッファの確保
 			if ( pcmBufSize[pcm] < dxpSoundCalcBufferSize(&pHnd->avContext, pHnd->avContext.outSampleNum) ) {
-				dxpSafeFree(pcmBuf[pcm]);
-				pcmBuf[pcm] = dxpSafeAlloc(dxpSoundCalcBufferSize(&pHnd->avContext, pHnd->avContext.outSampleNum));
+				free(pcmBuf[pcm]);
+				pcmBuf[pcm] = memalign(64, dxpSoundCalcBufferSize(&pHnd->avContext, pHnd->avContext.outSampleNum));
 				if ( !pcmBuf[pcm] ) {
 					pcmBufSize[pcm] = 0;
 					pHnd->playing = 0;
@@ -85,8 +84,8 @@ int dxpSoundThreadFunc_file(SceSize size,void* argp)
 			}
 		}
 	}
-	dxpSafeFree(pcmBuf[0]);
-	dxpSafeFree(pcmBuf[1]);
+	free(pcmBuf[0]);
+	free(pcmBuf[1]);
 	if(channel >= 0)sceAudioChRelease(channel);
 	pHnd->file.threadId = -1;
 	pHnd->cmd = DXP_SOUNDCMD_NONE;

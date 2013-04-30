@@ -17,15 +17,26 @@ For more details of based libraries, please see the doc directory.
 ### Differences from based libraries
 
 * Support OGG audio format
+* malloc is Thread-safe
 
-To use this library, need to link libvorbisidec libogg.
+To use this library,
 
-Here is a LIBS example:
+* DxLib_Init function must be called before malloc
+
+* libvorbisidec and libogg need to be linked
+
 ```
 LIBS = dxlibp.a -lvorbisidec -logg -ljpeg -lpng -lpspgum -lpspgu -lz -lm -lpsprtc -lpspaudio -lpspaudiocodec -lpsputility -lpspvalloc -lpsppower
 ```
 
-And the following copyright needs to be added:
+* Set LDFLAGS
+
+```
+LDFLAGS = -Wl,--wrap,malloc -Wl,--wrap,realloc -Wl,--wrap,calloc -Wl,--wrap,memalign -Wl,--wrap,free
+```
+
+* The following copyright needs to be added:
+
 ```
 libogg and libvorbisidec
 

@@ -1,11 +1,11 @@
 #include "../general.h"
 #include "../graphics.h"
-#include "../safealloc.h"
+#include "../memory.h"
 int DxLib_End()
 {
 	if(!dxpGeneralData.initialized)return 0;
 //	InitSoundMem();
 	dxpGraphicsEnd();
-	dxpSafeAllocEnd();
+	dxpMemoryEnd();
 	return 0;
 }

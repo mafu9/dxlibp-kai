@@ -2,7 +2,7 @@
 #include "../sound.h"
 #include "../input.h"
 #include "../graphics.h"
-#include "../safealloc.h"
+#include "../memory.h"
 #include <stdlib.h>
 #include <time.h>
 
@@ -40,7 +40,7 @@ int DxLib_Init()
 {
 	if(dxpGeneralData.initialized)return 0;
 
-	dxpSafeAllocInit();
+	dxpMemoryInit();
 	if(!dxpGeneralData.homebutton_callback_initialized)
 	{
 		dxpGeneralData.homebutton_callback_threadid = SetExitCallback();

@@ -3,7 +3,6 @@
 #include <string.h>
 #include <pspaudio.h>
 #include "../general.h"
-#include "../safealloc.h"
 
 DXPSOUNDHANDLE dxpSoundArray[DXP_BUILDOPTION_SOUNDHANDLE_MAX];
 DXPSOUNDDATA dxpSoundData = {0,DX_SOUNDDATATYPE_MEMNOPRESS};
@@ -126,7 +125,7 @@ int LoadSoundMem(const char *filename)
 		pHnd->memnopress.length = dxpSoundCodecGetSampleLength(pHnd);
 		int bufsize = dxpSoundCalcBufferSize(&pHnd->avContext, pHnd->memnopress.length);
 		bufsize = ((bufsize / pHnd->avContext.outSampleNum) + 1) * pHnd->avContext.outSampleNum;
-		pHnd->memnopress.pcmBuf = memalign(64, bufsize);
+		pHnd->memnopress.pcmBuf = (u32*)memalign(64, bufsize);
 		if ( !pHnd->memnopress.pcmBuf ) {
 			free(pHnd->memnopress.pcmBuf);
 			dxpSoundCodecEnd(pHnd);

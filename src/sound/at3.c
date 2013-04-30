@@ -1,5 +1,4 @@
 #include "../sound.h"
-#include "../safealloc.h"
 #include <string.h>
 #include <stdio.h>
 #include <malloc.h>
@@ -26,12 +25,12 @@ int dxpSoundAt3Init(DXPAVCONTEXT *av)
 	if ( FileRead_read( buffer, 12, av->fileHandle ) != 12 ) return -1;
 	if ( buffer[0] != 0x45564157 || buffer[1] != 0x20746D66 ) return -1;
 	
-	u8* fmt_data = (u8*)dxpSafeAlloc(buffer[2]);
+	u8* fmt_data = (u8*)malloc(buffer[2]);
 	if ( !fmt_data ) return -1;
 
 	//fmtチャンク
 	if ( FileRead_read( fmt_data, buffer[2], av->fileHandle ) != buffer[2] ) {
-		dxpSafeFree(fmt_data);
+		free(fmt_data);
 		return -1;
 	}
 	
@@ -59,7 +58,7 @@ int dxpSoundAt3Init(DXPAVCONTEXT *av)
 	av->nextPos = 0;
 	av->outSampleNum = av->at3.samples_per_frame;
 
-	dxpSafeFree(fmt_data);
+	free(fmt_data);
 
 	//dataチャンクまで進める
 	if ( FileRead_read( buffer, 8, av->fileHandle ) != 8 ) return -1;
@@ -86,7 +85,7 @@ int dxpSoundAt3Init(DXPAVCONTEXT *av)
 	}
 
 	//デコードのためのバッファ確保
-	av->at3.codecBuf = dxpSafeAlloc(sizeof(u32) * 65);
+	av->at3.codecBuf = (unsigned long*)memalign(64, sizeof(u32) * 65);
 	if ( !av->at3.codecBuf ) return -1;
 	memset(av->at3.codecBuf, 0, sizeof(u32) * 65);
 
@@ -115,11 +114,11 @@ int dxpSoundAt3Init(DXPAVCONTEXT *av)
 		int temp_size = av->at3.dataBufSize;
 		int mod_64 = temp_size & 0x3F;
 		if ( mod_64 != 0 ) temp_size += 64 - mod_64;
-		av->at3.dataBuf = (u8*)dxpSafeAlloc(temp_size);
+		av->at3.dataBuf = (u8*)memalign(64, temp_size);
 		av->nextPos = 0;
 		av->outSampleNum = 1024;
 		if ( !av->at3.dataBuf ) {
-			dxpSafeFree(av->at3.codecBuf);
+			free(av->at3.codecBuf);
 			return -1;
 		}
 
@@ -127,15 +126,15 @@ int dxpSoundAt3Init(DXPAVCONTEXT *av)
 
 		status = sceAudiocodecCheckNeedMem(av->at3.codecBuf, PSP_CODEC_AT3PLUS);
 		if ( status < 0 ) {
-			dxpSafeFree(av->at3.codecBuf);
-			dxpSafeFree(av->at3.dataBuf);
+			free(av->at3.codecBuf);
+			free(av->at3.dataBuf);
 			return -1;
 		}
 
 		status = sceAudiocodecGetEDRAM(av->at3.codecBuf, PSP_CODEC_AT3PLUS);
 		if ( status < 0 ) {
-			dxpSafeFree(av->at3.codecBuf);
-			dxpSafeFree(av->at3.dataBuf);
+			free(av->at3.codecBuf);
+			free(av->at3.dataBuf);
 			return -1;
 		}
 
@@ -145,8 +144,8 @@ int dxpSoundAt3Init(DXPAVCONTEXT *av)
 		status = sceAudiocodecInit(av->at3.codecBuf, PSP_CODEC_AT3PLUS);
 		if ( status < 0 ) {
 			sceAudiocodecReleaseEDRAM(av->at3.codecBuf);
-			dxpSafeFree(av->at3.codecBuf);
-			dxpSafeFree(av->at3.dataBuf);
+			free(av->at3.codecBuf);
+			free(av->at3.dataBuf);
 			return -1;
 		}
 
@@ -170,11 +169,11 @@ int dxpSoundAt3Init(DXPAVCONTEXT *av)
 		int temp_size = av->at3.data_align + 8;
 		int mod_64 = temp_size & 0x3F;
 		if ( mod_64 != 0 ) temp_size += 64 - mod_64;
-		av->at3.dataBuf = (u8*)dxpSafeAlloc(temp_size);
+		av->at3.dataBuf = (u8*)memalign(64, temp_size);
 		av->nextPos = 0;
 		av->outSampleNum = 2048;
 		if ( !av->at3.dataBuf ) {
-			dxpSafeFree(av->at3.codecBuf);
+			free(av->at3.codecBuf);
 			return -1;
 		}
 
@@ -186,23 +185,23 @@ int dxpSoundAt3Init(DXPAVCONTEXT *av)
 
 		status = sceAudiocodecCheckNeedMem(av->at3.codecBuf, PSP_CODEC_AT3PLUS);
 		if ( status < 0 ) {
-			dxpSafeFree(av->at3.codecBuf);
-			dxpSafeFree(av->at3.dataBuf);
+			free(av->at3.codecBuf);
+			free(av->at3.dataBuf);
 			return -1;
 		}
 
 		status = sceAudiocodecGetEDRAM(av->at3.codecBuf, PSP_CODEC_AT3PLUS);
 		if ( status < 0 ) {
-			dxpSafeFree(av->at3.codecBuf);
-			dxpSafeFree(av->at3.dataBuf);
+			free(av->at3.codecBuf);
+			free(av->at3.dataBuf);
 			return -1;
 		}
 
 		status = sceAudiocodecInit(av->at3.codecBuf, PSP_CODEC_AT3PLUS);
 		if ( status < 0 ) {
 			sceAudiocodecReleaseEDRAM(av->at3.codecBuf);
-			dxpSafeFree(av->at3.codecBuf);
-			dxpSafeFree(av->at3.dataBuf);
+			free(av->at3.codecBuf);
+			free(av->at3.dataBuf);
 			return -1;
 		}
 	}
@@ -267,8 +266,8 @@ int dxpSoundAt3End(DXPAVCONTEXT *av)
 {
 	if ( av->format != DXP_SOUNDFMT_AT3 ) return -1;
 	sceAudiocodecReleaseEDRAM(av->at3.codecBuf);
-	dxpSafeFree(av->at3.codecBuf);
-	dxpSafeFree(av->at3.dataBuf);
+	free(av->at3.codecBuf);
+	free(av->at3.dataBuf);
 	return 0;
 }
 

@@ -1,5 +1,4 @@
 #include "../sound.h"
-#include "../safealloc.h"
 #include <string.h>
 #include <stdio.h>
 #include <malloc.h>
@@ -25,11 +24,11 @@ int dxpSoundWavInit(DXPAVCONTEXT *av)
 	if ( FileRead_read( buffer, 12, av->fileHandle ) != 12 ) return -1;
 	if ( buffer[0] != 0x45564157 || buffer[1] != 0x20746D66 ) return -1;
 	
-	u8* fmt_data = (u8*)dxpSafeAlloc(buffer[2]);
+	u8* fmt_data = (u8*)malloc(buffer[2]);
 	if ( !fmt_data ) return -1;
 
 	if ( FileRead_read( fmt_data, buffer[2], av->fileHandle ) != buffer[2] ) {
-		dxpSafeFree(fmt_data);
+		free(fmt_data);
 		return -1;
 	}
 	
@@ -43,7 +42,7 @@ int dxpSoundWavInit(DXPAVCONTEXT *av)
 	av->channels		= channels;
 	av->format			= DXP_SOUNDFMT_WAV;
 	
-	dxpSafeFree(fmt_data);
+	free(fmt_data);
 	
 	if ( wave_type != WAVE_FORMAT_PCM ) return -1;
 

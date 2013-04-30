@@ -1946,6 +1946,31 @@ int ShowSaveDialog(
 int SetSaveResource(int type, void * buf, unsigned int size);
 /*@}*/
 
+/**@defgroup メモリ関連*/
+/*@{*/
+/** 
+ * メモリの総サイズを取得します。
+ *
+ * @return メモリの総サイズ(単位はバイト)
+*/
+unsigned int GetMemoryTotalSize(void);
+/** 
+ * メモリの空き総サイズを取得します。
+ *
+ * @param fast 小さなメモリブロックは無視して高速で計算するかどうかのフラグ
+ * @return メモリの空き総サイズ(単位はバイト)
+*/
+unsigned int GetMemoryFreeSize(int fast);
+/** 
+ * メモリのアサートを有効にするかのフラグ。
+ *
+ * @param flag メモリアサートフラグ
+ * @retval 0 成功
+ * @retval -1 失敗
+*/
+int SetMemoryAssertFlag(int flag);
+/*@}*/
+
 /**@defgroup デバッグ関連*/
 /*@{*/
 /** 

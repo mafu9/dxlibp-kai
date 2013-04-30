@@ -1,7 +1,6 @@
 #include "../sound.h"
-#include "../safealloc.h"
 #include <string.h>
-#include <stdio.h>
+#include <malloc.h>
 
 static size_t ogg_read_func(void *ptr, size_t size, size_t nmemb, void *datasource)
 {
@@ -32,7 +31,7 @@ int dxpSoundOggInit(DXPAVCONTEXT *av)
 	ov_callbacks callbacks;
 	vorbis_info *vi;
 	int ret;
-	av->ogg.file = (OggVorbis_File*)dxpSafeAlloc(sizeof(OggVorbis_File));
+	av->ogg.file = (OggVorbis_File*)malloc(sizeof(OggVorbis_File));
 	if(!av->ogg.file)return -1;
 	memset(av->ogg.file,0,sizeof(OggVorbis_File));
 	callbacks.read_func = ogg_read_func;
@@ -43,14 +42,14 @@ int dxpSoundOggInit(DXPAVCONTEXT *av)
 	ret = ov_open_callbacks(&av->fileHandle,av->ogg.file,NULL,0,callbacks);
 	if(ret < 0)
 	{
-		dxpSafeFree(av->ogg.file);
+		free(av->ogg.file);
 		return -1;
 	}
 	vi = ov_info(av->ogg.file, -1);
 	if(!vi || (vi->channels != 1 && vi->channels != 2))
 	{
 		ov_clear(av->ogg.file);
-		dxpSafeFree(av->ogg.file);
+		free(av->ogg.file);
 		return -1;
 	}
 	av->sampleSize = 2;
@@ -101,7 +100,7 @@ int dxpSoundOggEnd(DXPAVCONTEXT *av)
 {
 	if(av->format != DXP_SOUNDFMT_OGG)return -1;
 	ov_clear(av->ogg.file);
-	dxpSafeFree(av->ogg.file);
+	free(av->ogg.file);
 	return 0;
 }
 
