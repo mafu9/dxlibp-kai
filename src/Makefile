@@ -23,6 +23,7 @@ OBJS += memory/memutils.o
 OBJS += memory/getmemoryfreesize.o
 OBJS += memory/getmemorytotalsize.o
 OBJS += memory/setmemoryassertflag.o
+OBJS += memory/getmemoryassertflag.o
 
 #file io functions
 OBJS += fileio/fileio.o

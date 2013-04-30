@@ -1962,13 +1962,19 @@ unsigned int GetMemoryTotalSize(void);
 */
 unsigned int GetMemoryFreeSize(int fast);
 /** 
- * メモリのアサートを有効にするかのフラグ。
+ * メモリのアサートを有効にするかを設定する。
  *
  * @param flag メモリアサートフラグ
  * @retval 0 成功
  * @retval -1 失敗
 */
 int SetMemoryAssertFlag(int flag);
+/** 
+ * メモリのアサートが有効かどうかを取得。
+ *
+ * @return メモリアサートフラグ
+*/
+int GetMemoryAssertFlag(void);
 /*@}*/
 
 /**@defgroup デバッグ関連*/
