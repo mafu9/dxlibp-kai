@@ -80,7 +80,7 @@ void* __wrap_malloc(size_t size)
 	ptr = __real_malloc(size);
 	if(ptr == NULL && size != 0 && dxpMemoryIsSingleLocked() && dxpMemoryData.memAssert)
 	{
-		fprintf(stderr, "malloc failed: %ubytes\r\n", size);
+		fprintf(stderr, "malloc failed: %ubytes\n", size);
 		dxpMemoryError();
 	}
 	dxpMemoryUnlock();
@@ -94,7 +94,7 @@ void* __wrap_realloc(void *ptr, size_t size)
 	newPtr = __real_realloc(ptr, size);
 	if(newPtr == NULL && size != 0 && dxpMemoryIsSingleLocked() && dxpMemoryData.memAssert)
 	{
-		fprintf(stderr, "realloc failed: %p %ubytes\r\n", ptr, size);
+		fprintf(stderr, "realloc failed: %p %ubytes\n", ptr, size);
 		dxpMemoryError();
 	}
 	dxpMemoryUnlock();
@@ -108,7 +108,7 @@ void *__wrap_calloc(size_t n, size_t size)
 	ptr = __real_calloc(n, size);
 	if(ptr == NULL && n != 0 && size != 0 && dxpMemoryIsSingleLocked() && dxpMemoryData.memAssert)
 	{
-		fprintf(stderr, "calloc failed: %ublocks %ubytes\r\n", n, size);
+		fprintf(stderr, "calloc failed: %ublocks %ubytes\n", n, size);
 		dxpMemoryError();
 	}
 	dxpMemoryUnlock();
@@ -122,7 +122,7 @@ void* __wrap_memalign(size_t align, size_t size)
 	ptr = __real_memalign(align, size);
 	if(ptr == NULL && size > 0 && dxpMemoryIsSingleLocked() && dxpMemoryData.memAssert)
 	{
-		fprintf(stderr, "memalign failed: %ubytes(aligned %ubytes)\r\n", size, align);
+		fprintf(stderr, "memalign failed: %ubytes(aligned %ubytes)\n", size, align);
 		dxpMemoryError();
 	}
 	dxpMemoryUnlock();
