@@ -8,7 +8,7 @@ int	FileRead_read(void *buffer,int readsize,int filehandle)
 	{
 		int i;
 		for(i = 0;i < readsize && pHnd->pos < pHnd->size;++i,++pHnd->pos)
-			((u8*)buffer)[pHnd->pos] = ((u8*)pHnd->dat)[pHnd->pos];
+			((u8*)buffer)[pHnd->pos] = ((const u8*)pHnd->dat)[pHnd->pos];
 		return i;
 	}
 	if(dxpFileioData.sleep)

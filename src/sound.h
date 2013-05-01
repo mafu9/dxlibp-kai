@@ -136,12 +136,16 @@ typedef struct DXPSOUNDHANDLE
 	int playing;
 
 	union {
+		//DX_SOUNDDATATYPE_MEMPRESSとDX_SOUNDDATATYPE_FILEで使用される
 		struct {
 			int threadId;
 			int gotoPos;
 			int loop;
+			//DX_SOUNDDATATYPE_MEMPRESSでのみ使用
+			void *buffer;
 		} file;
 
+		//DX_SOUNDDATATYPE_MEMNOPRESSで使用
 		struct {
 			int length;
 			u32 *pcmBuf;

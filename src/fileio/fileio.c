@@ -82,3 +82,24 @@ int dxpFileioReopen(int handle)
 	return 0;
 }
 
+int dxpFileioOpenOnMemory(const void *buffer, u32 size)
+{
+	DXPFILEIOHANDLE *pHnd;
+	int i;
+	if(!dxpFileioData.init)dxpFileioInit();
+	for(i = 0;i < DXP_BUILDOPTION_FILEHANDLE_MAX;++i)
+		if(!dxpFileioData.handleArray[i].used)break;
+	if(i >= DXP_BUILDOPTION_FILEHANDLE_MAX)
+	{
+		return 0;
+	}
+	pHnd = &dxpFileioData.handleArray[i];
+	strcpy(pHnd->filename, "@mem");
+	pHnd->used = 1;
+	pHnd->onmemory = 1;
+	pHnd->pos = 0;
+	pHnd->dat = buffer;
+	pHnd->size = size;
+	return i + 1;
+}
+

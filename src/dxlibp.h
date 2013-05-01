@@ -411,7 +411,7 @@ typedef void (*DialogCallback)(void);
 
 /* 音楽 */
 #define DX_SOUNDDATATYPE_MEMNOPRESS					(0)
-//#define DX_SOUNDDATATYPE_MEMPRESS					(1)
+#define DX_SOUNDDATATYPE_MEMPRESS					(1)
 #define DX_SOUNDDATATYPE_FILE						(3)
 
 
@@ -1658,11 +1658,11 @@ int SetLoopSamplePosSoundMem(int looppos,int handle);
  * LoadSoundMemはメモリ上に音楽データを展開し、それを再生します。
  * この関数でその時の挙動を変更できます。
  * 指定可能な値は以下の通り
- * - DX_SOUNDDATATYPE_MEMNOPRESS	メモリ上にデータを展開し、それを再生します。
- * - DX_SOUNDDATATYPE_FILE ストリーミング再生をします。
+ * - DX_SOUNDDATATYPE_MEMNOPRESS メモリ上にデータを展開し、それを再生します。
+ * - DX_SOUNDDATATYPE_MEMPRESS データを展開せずにメモリ上に置き、メモリからストリーミング再生をします。
+ * - DX_SOUNDDATATYPE_FILE ファイルからストリーミング再生をします。
  * 
  * 以下の値は現在使えません。
- * - DX_SOUNDDATATYPE_MEMPRESS
  * - DX_SOUNDDATATYPE_MEMPRESS_PLUS
  * @retval 0 成功
  * @retval -1 失敗

@@ -11,7 +11,7 @@ int FileRead_getc(int filehandle)
 			pHnd->pos = pHnd->size;
 			return -1;
 		}
-		return ((u8*)pHnd->dat)[pHnd->pos++];
+		return ((const u8*)pHnd->dat)[pHnd->pos++];
 	}
 	if(dxpFileioData.sleep)
 		if(dxpFileioReopen(filehandle) < 0)return -1;
