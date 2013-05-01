@@ -282,6 +282,7 @@ int SetCreateSoundDataType(int type)
 	case DX_SOUNDDATATYPE_MEMNOPRESS:
 	case DX_SOUNDDATATYPE_FILE:
 		dxpSoundData.createSoundDataType = type;
+		return 0;
 	default:
 		return -1;
 	}
@@ -325,6 +326,11 @@ int SetLoopSamplePosSoundMem(int looppos,int handle)
 	{
 	case DX_SOUNDDATATYPE_MEMNOPRESS:
 		if(looppos >= pHnd->memnopress.length)return -1;
+		break;
+	case DX_SOUNDDATATYPE_FILE:
+		break;
+	default:
+		return -1;
 	}
 	pHnd->loopResumePos = looppos;
 	return 0;
