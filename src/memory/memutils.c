@@ -71,6 +71,7 @@ static int dxpMemoryIsSingleLocked(void)
 
 static void dxpMemoryError(void)
 {
+	fflush(stderr);
 }
 
 void* __wrap_malloc(size_t size)
