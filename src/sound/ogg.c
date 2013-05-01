@@ -89,6 +89,7 @@ int dxpSoundOggDecode(DXPAVCONTEXT *av)
 	vorbis_info *vi;
 	u8 *pcmOut = (u8*)av->pcmOut;
 	if(av->format != DXP_SOUNDFMT_OGG)return -1;
+	if(len <= 0)return -1; // EOF
 	while(len > 0)
 	{
 		ret = ov_read(av->ogg.file,(char*)pcmOut,len,&bitstream);
