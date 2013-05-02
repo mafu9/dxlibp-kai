@@ -3,6 +3,7 @@
 int FileRead_gets(char *buffer,int buffersize,int filehandle)
 {
 	int i,c;
+	if(!dxpFileioData.init)return -1;
 	for(i = 0;i < buffersize;++i)
 	{
 		c = FileRead_getc(filehandle);

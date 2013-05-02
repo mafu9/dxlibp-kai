@@ -28,39 +28,46 @@ static int dxpPowerCallback(int unk0,int flag,void* arg)
 
 static int dxpPowerCallbackThread(SceSize args, void *argp)
 {
-    int cbid;
+	SceUID cbid;
 	cbid = sceKernelCreateCallback("dxp power callback", dxpPowerCallback, NULL);
-    scePowerRegisterCallback(-1, cbid);
-    sceKernelSleepThreadCB();
+	scePowerRegisterCallback(-1, cbid);
+	sceKernelSleepThreadCB();
 	return 0;
 }
 
 static int dxpPowerSetupCallback(void)
 {
-    int thid = 0;
+	SceUID thid = 0;
 	thid = sceKernelCreateThread("update_thread", dxpPowerCallbackThread, 0x11, 0xFA0, 0, 0);
-    if (thid >= 0)
-	sceKernelStartThread(thid, 0, 0);
-    return thid;
+	if(thid >= 0)sceKernelStartThread(thid, 0, 0);
+	return thid;
 }
 
-void dxpFileioInit()
+int dxpFileioInit(void)
 {
+	char name[32];
 	int i;
-	if(dxpFileioData.init)return;
+	if(dxpFileioData.init)return 0;
 	for(i = 0;i < DXP_BUILDOPTION_FILEHANDLE_MAX;++i)
 	{
 		dxpFileioData.handleArray[i].used = 0;
 	}
+	for(i = 0; i < sizeof(dxpFileioData.eventFlags) / sizeof(dxpFileioData.eventFlags[0]); ++i)
+	{
+		snprintf(name, 32, "dxp file event flag %d", i);
+		dxpFileioData.eventFlags[i] = sceKernelCreateEventFlag(name, 0, 0xFFFFFFFF, NULL);
+		if(dxpFileioData.eventFlags[i] < 0)return -1;
+	}
 	dxpPowerSetupCallback();
 	dxpFileioData.init = 1;
+	return 0;
 }
 
-int dxpFileioReopen(int handle)
+int dxpFileioReopen(DXPFILEIOHANDLE *pHnd)
 {
 	char name[DXP_BUILDOPTION_FILENAMELENGTH_MAX];
-	DXPFILEIOHANDLE *pHnd;
-	FHANDLE2PTR(pHnd,handle);
+	if(!dxpFileioData.init)return -1;
+	if(!pHnd)return -1;
 	if(pHnd->onmemory)return 0;
 	while(dxpFileioData.sleep)
 	{
@@ -86,7 +93,7 @@ int dxpFileioOpenOnMemory(const void *buffer, u32 size)
 {
 	DXPFILEIOHANDLE *pHnd;
 	int i;
-	if(!dxpFileioData.init)dxpFileioInit();
+	if(!dxpFileioData.init)return 0;
 	for(i = 0;i < DXP_BUILDOPTION_FILEHANDLE_MAX;++i)
 		if(!dxpFileioData.handleArray[i].used)break;
 	if(i >= DXP_BUILDOPTION_FILEHANDLE_MAX)
