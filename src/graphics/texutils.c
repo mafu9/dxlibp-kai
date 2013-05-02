@@ -523,6 +523,9 @@ LOCAL(void) jpeg_dxpio_src(j_decompress_ptr cinfo, int fileHandle)
 
 METHODDEF(void) jpeg_error_exit(j_common_ptr cinfo)
 {
+	DXPJPEGERRMGR *err = (DXPJPEGERRMGR*)cinfo->err;
+	(*cinfo->err->output_message)(cinfo);
+	longjmp(err->setjmp_buffer, 1);
 }
 
 #endif
@@ -544,11 +547,20 @@ static DXPTEXTURE3* dxpLoadJpegImage(int fileHandle)
 
 	int y = 0, x = 0, i = 0;
 	struct jpeg_decompress_struct cinfo;
-	struct jpeg_error_mgr jerr;
+	DXPJPEGERRMGR jerr;
+	u8 *data = NULL, *linedata = NULL;
 
 	//read header
-	cinfo.err = jpeg_std_error(&jerr);
-	jerr.error_exit = jpeg_error_exit;
+	cinfo.err = jpeg_std_error(&jerr.pub);
+	jerr.pub.error_exit = jpeg_error_exit;
+	if(setjmp(jerr.setjmp_buffer))
+	{
+		jpeg_destroy_decompress(&cinfo);
+		free(data);
+		free(linedata);
+		dxpGraphicsReleseTexture(texptr);
+		return NULL;
+	}
 	jpeg_create_decompress(&cinfo);
 	jpeg_dxpio_src(&cinfo, fileHandle);
 	jpeg_read_header(&cinfo, TRUE);
@@ -563,17 +575,19 @@ static DXPTEXTURE3* dxpLoadJpegImage(int fileHandle)
 	int texheight = AlignPow2(height);
 	int bufsize = pitch * texheight * 4;
 	if ( width > 512 || height > 512 ) {
-		jpeg_abort_decompress(&cinfo);
+		jpeg_finish_decompress(&cinfo);
+		jpeg_destroy_decompress(&cinfo);
 		dxpGraphicsReleseTexture(texptr);
 		return NULL;
 	}
 
-	u8* data = (u8*)malloc(bufsize);
-	u8* linedata = (u8*)malloc(3 * width);
+	data = (u8*)malloc(bufsize);
+	linedata = (u8*)malloc(3 * width);
 	if ( data == NULL || linedata == NULL ) {
 		if ( data ) free(data);
 		if ( linedata ) free(linedata);
-		jpeg_abort_decompress(&cinfo);
+		jpeg_finish_decompress(&cinfo);
+		jpeg_destroy_decompress(&cinfo);
 		dxpGraphicsReleseTexture(texptr);
 		return NULL;
 	}

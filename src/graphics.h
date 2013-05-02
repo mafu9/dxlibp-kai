@@ -13,6 +13,7 @@
 #ifdef DXP_BUILDOPTION_USE_LIBJPEG
 #include <jpeglib.h>
 #include <jerror.h>
+#include <setjmp.h>
 #endif
 
 /*
@@ -98,6 +99,7 @@ typedef struct __DXPJPEGDESTMGR
 typedef struct __DXPJPEGERRMGR
 {
 	struct jpeg_error_mgr pub;
+	jmp_buf setjmp_buffer;
 } DXPJPEGERRMGR;
 
 //JPEGの設定
