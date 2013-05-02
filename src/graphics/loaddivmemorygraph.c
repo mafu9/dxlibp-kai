@@ -1,6 +1,6 @@
 #include "../graphics.h"
 
-int LoadDivMemoryGraph(void *data, unsigned int size, int allnum, int xnum, int ynum, int xsize, int ysize, int *handlebuf)
+int LoadDivMemoryGraph(const void *data, unsigned int size, int allnum, int xnum, int ynum, int xsize, int ysize, int *handlebuf)
 {
 	if(!handlebuf || !data || !size || allnum <= 0 || xnum <= 0 || ynum <= 0 || xsize <= 0 || ysize <= 0)return -1;
 	int gh = LoadMemoryGraph(data, size);

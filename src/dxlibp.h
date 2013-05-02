@@ -1083,7 +1083,7 @@ int LoadDivGraph(const char *filename,int allnum,int xnum,int ynum,int xsize,int
  * @retval 0 成功
  * @retval -1 失敗
 */
-int LoadMemoryGraphScreen(int x, int y, void *data, unsigned int size, int trans);
+int LoadMemoryGraphScreen(int x, int y, const void *data, unsigned int size, int trans);
 /**
  * メモリ上の画像を読み込みます(ほぼ本家互換)
  * 
@@ -1094,7 +1094,7 @@ int LoadMemoryGraphScreen(int x, int y, void *data, unsigned int size, int trans
  * @return グラフィックスハンドル
  * @retval -1 失敗
 */
-int LoadMemoryGraph(void* data, unsigned int size);
+int LoadMemoryGraph(const void *data, unsigned int size);
 /**
  * メモリ上の画像データから複数のグラフィックスハンドルを作ります(ほぼ本家互換)
  * 
@@ -1108,7 +1108,7 @@ int LoadMemoryGraph(void* data, unsigned int size);
  * @param ysize 分割された画像一つの縦幅
  * @param handlebuf 分割読み込みして得たグラフィックハンドルを保存するint型の配列へのポインタ
 */
-int LoadDivMemoryGraph(void *data, unsigned int size, int allnum, int xnum, int ynum, int xsize, int ysize, int *handlebuf);
+int LoadDivMemoryGraph(const void *data, unsigned int size, int allnum, int xnum, int ynum, int xsize, int ysize, int *handlebuf);
 /**
  * 空のグラフィックスハンドルを生成する(本家互換)
  * 

@@ -12,6 +12,7 @@
 /* libjpeg */
 #ifdef DXP_BUILDOPTION_USE_LIBJPEG
 #include <jpeglib.h>
+#include <jerror.h>
 #endif
 
 /*
@@ -58,6 +59,8 @@ DRAM上ではswizzleする
 #define BMP_INFO_HEADER_SIZE		40
 #define BMP_HEADER_SIZE				(BMP_FILE_HEADER_SIZE + BMP_INFO_HEADER_SIZE)
 
+#define JPEG_INPUT_BUF_SIZE			4096
+
 typedef struct _DXP_BMP_HEADER {
 	/* file header */
 	u32 file_size;
@@ -77,6 +80,25 @@ typedef struct _DXP_BMP_HEADER {
 	u32 palette;
 	u32 color;
 } DXP_BMP_HEADER ;
+
+typedef struct __DXPJPEGSRCMGR {
+	struct jpeg_source_mgr pub; // public fields
+	int fileHandle;
+	JOCTET *buffer;
+	int startOfFile;
+} DXPJPEGSRCMGR;
+
+typedef struct __DXPJPEGDESTMGR
+{
+	struct jpeg_destination_mgr pub; // public fields
+	JOCTET *buffer;
+	u32 length;
+} DXPJPEGDESTMGR;
+
+typedef struct __DXPJPEGERRMGR
+{
+	struct jpeg_error_mgr pub;
+} DXPJPEGERRMGR;
 
 //JPEGの設定
 typedef struct __JPEGSETTING {
@@ -417,6 +439,7 @@ int dxpGraphicsReleseTexture(DXPTEXTURE3* texptr);
 DXPGRAPHICSHANDLE* dxpGraphicsCreateGraphicHandle();
 int dxpGraphicsReleseGraphicHandle(DXPGRAPHICSHANDLE* gptr);
 
+int dxpGraphLoadFromFileHandle(int fileHandle);
 
 int dxpGraphicsSetup2DTex(DXPTEXTURE3 *texptr,int flag);
 int dxpGraphicsSetup3DTex(DXPGRAPHICSHANDLE *gptr,int flag);
