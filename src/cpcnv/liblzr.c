@@ -73,10 +73,10 @@ int LZRDecompress(void *out, unsigned int out_capacity, void *in, void *in_end) 
 	                      ((unsigned int)*(unsigned char*)(in+2) << 16) + 
 	                      ((unsigned int)*(unsigned char*)(in+3) <<  8) + 
 	                      ((unsigned int)*(unsigned char*)(in+4)      );	
-	next_in = (in_end) ? in_end : &tmp; //use user provided counter if available
-	*next_in = in + 5;
-	next_out = out;
-	out_end = out + out_capacity;
+	next_in = (in_end) ? (unsigned char**)in_end : &tmp; //use user provided counter if available
+	*next_in = (unsigned char*)in + 5;
+	next_out = (unsigned char*)out;
+	out_end = (unsigned char*)out + out_capacity;
 
 	if (type < 0) { 
 		

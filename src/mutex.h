@@ -30,5 +30,5 @@ int dxpMutexInit(void);
 int dxpMutexLock(DXPMUTEX *pHnd, int tryFlag);
 int dxpMutexUnlock(DXPMUTEX *pHnd);
 
-#define MHANDLE2PTR(PTR,HANDLE) {if(HANDLE < 0 || HANDLE >= DXP_MUTEXHANDLE_MAX)return -1;PTR = dxpMutexData.handleArray + HANDLE;}
+#define MHANDLE2PTR(PTR,HANDLE) {if(HANDLE < 0 || HANDLE >= DXP_MUTEXHANDLE_MAX)return -1;PTR = dxpMutexData.handleArray + (HANDLE);}
 

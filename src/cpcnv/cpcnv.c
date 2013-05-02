@@ -43,15 +43,15 @@ int dxpCpLoadTable(const char *filename,u8 cp,u8 direction) {
 	if (cp >= DXPCPTABLE_MAX || direction > 1) return -1;
 
 	SceUID fd = sceIoOpen(filename, PSP_O_RDONLY, 0777);
-    if (fd < 0) return -1;
-    unsigned int filesize = sceIoLseek(fd, 0, SEEK_END);
-    sceIoLseek(fd, 0, SEEK_SET);
-    void* table_data = (void*)malloc(filesize);
+	if (fd < 0) return -1;
+	unsigned int filesize = sceIoLseek(fd, 0, SEEK_END);
+	sceIoLseek(fd, 0, SEEK_SET);
+	void* table_data = (void*)malloc(filesize);
 	if (!table_data) {
 		sceIoClose(fd);
 		return -1;
 	}
-    if (sceIoRead(fd, table_data, filesize) != filesize) {
+	if (sceIoRead(fd, table_data, filesize) != filesize) {
 		sceIoClose(fd);
 		free(table_data);
 		return -1;
@@ -155,6 +155,8 @@ int dxpCpCode_toUcs2(dxpUcs2 *dst,u32 count,const dxpChar *src,u8 cp)
 			return dxpCpSJIS_toUcs2(dst, count, src);
 		case DXP_CP_UTF8:
 			return dxpCpUTF8_toUcs2(dst, count, src);
+		default:
+			return -1;
 	} 	
 	if (cp >= DXPCPTABLE_MAX)return -1;
 	if (!dxpCpData.init)dxpCpInit();
@@ -183,6 +185,8 @@ int dxpCpCode_fromUcs2(dxpChar *dst,u32 count,const dxpUcs2 *src,u8 cp)
 			return dxpCpSJIS_fromUcs2(dst, count, src);
 		case DXP_CP_UTF8:
 			return dxpCpUTF8_fromUcs2(dst, count, src);
+		default:
+			return -1;
 	}
 	if (cp >= DXPCPTABLE_MAX)return -1;
 	if (!dxpCpData.init)dxpCpInit();

@@ -2,11 +2,12 @@
 #include "../graphics.h"
 DXPDEBUGDATA dxpDebugData =
 {
-	0,//init
-	0,
-	0,
-	0,
-	{6,12},
+	.init = 0,
+	.cx = 0,
+	.cy = 0,
+	.l1 = 0,
+	.fontsize = {6,12},
+	.strbufsize = {}
 };
 DXP_DEBUG_BUF dxpDebugBuf;
 

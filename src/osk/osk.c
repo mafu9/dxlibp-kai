@@ -15,9 +15,9 @@ int GetTextOSK(char *buf,int buflen,int mode,const char *title,const char *init)
 	char nulstr[] = "";
 	if(init == NULL)init = nulstr;
 	if(title == NULL)title = nulstr;
-	winit = malloc((strlen(init) + 1) * 2);
-	wtitle = malloc((strlen(title) + 1) * 2);
-	wresult = malloc((buflen + 1) * 2);
+	winit = (u16*)malloc((strlen(init) + 1) * 2);
+	wtitle = (u16*)malloc((strlen(title) + 1) * 2);
+	wresult = (u16*)malloc((buflen + 1) * 2);
 	if(winit == NULL || wtitle == NULL || wresult == NULL)
 	{
 		free(winit);
@@ -27,8 +27,8 @@ int GetTextOSK(char *buf,int buflen,int mode,const char *title,const char *init)
 	}
 
 
-	dxpCpCode_toUcs2(winit,strlen(init) + 1,(u8*)init,dxpGeneralData.charset);
-	dxpCpCode_toUcs2(wtitle,strlen(title) + 1,(u8*)title,dxpGeneralData.charset);
+	dxpCpCode_toUcs2(winit,strlen(init) + 1,(const dxpChar*)init,dxpGeneralData.charset);
+	dxpCpCode_toUcs2(wtitle,strlen(title) + 1,(const dxpChar*)title,dxpGeneralData.charset);
 
 	SceUtilityOskData data;
 	memset(&data, 0, sizeof(SceUtilityOskData));
@@ -87,8 +87,8 @@ int GetTextOSK(char *buf,int buflen,int mode,const char *title,const char *init)
 		ScreenFlip();
 	}
 
-//	dxpCpSJIS_fromUcs2((u8*)buf,buflen,wresult);
-	dxpCpCode_fromUcs2((u8*)buf,buflen,wresult,dxpGeneralData.charset);
+//	dxpCpSJIS_fromUcs2((dxpChar*)buf,buflen,wresult);
+	dxpCpCode_fromUcs2((dxpChar*)buf,buflen,wresult,dxpGeneralData.charset);
 	free(winit);
 	free(wtitle);
 	free(wresult);

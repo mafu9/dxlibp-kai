@@ -15,7 +15,7 @@ int DrawTriangle3D(VECTOR pos1,VECTOR pos2,VECTOR pos3,int color,int fillflag)
 		DrawLine3D(pos3,pos1,color);
 		return 0;
 	}
-	DXP_FVF_3D *vtx = dxpGuGetMemory(sizeof(DXP_FVF_3D) * 3);
+	DXP_FVF_3D *vtx = (DXP_FVF_3D*)dxpGuGetMemory(sizeof(DXP_FVF_3D) * 3);
 	if(!vtx)return -1;
 	vtx[0].x = pos1.x;
 	vtx[0].y = pos1.y;

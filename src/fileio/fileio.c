@@ -6,8 +6,8 @@
 
 DXPFILEIODATA dxpFileioData = 
 {
-	0,
-	0,
+	.init = 0,
+	.sleep = 0,
 };
 
 //local functions ----
@@ -48,10 +48,7 @@ int dxpFileioInit(void)
 	char name[32];
 	int i;
 	if(dxpFileioData.init)return 0;
-	for(i = 0;i < DXP_BUILDOPTION_FILEHANDLE_MAX;++i)
-	{
-		dxpFileioData.handleArray[i].used = 0;
-	}
+	for(i = 0;i < DXP_BUILDOPTION_FILEHANDLE_MAX;++i)dxpFileioData.handleArray[i].used = 0;
 	for(i = 0; i < sizeof(dxpFileioData.eventFlags) / sizeof(dxpFileioData.eventFlags[0]); ++i)
 	{
 		snprintf(name, 32, "dxp file event flag %d", i);
@@ -69,10 +66,7 @@ int dxpFileioReopen(DXPFILEIOHANDLE *pHnd)
 	if(!dxpFileioData.init)return -1;
 	if(!pHnd)return -1;
 	if(pHnd->onmemory)return 0;
-	while(dxpFileioData.sleep)
-	{
-		sceKernelDelayThread(100);
-	}
+	while(dxpFileioData.sleep)sceKernelDelayThread(100);
 	pHnd->fd = sceIoOpen(pHnd->filename,PSP_O_RDONLY,0777);
 	if(pHnd->fd == SCE_KERNEL_ERROR_NOCWD)
 	{

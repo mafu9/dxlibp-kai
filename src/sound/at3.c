@@ -5,7 +5,7 @@
 #include <psputility.h>
 #include <pspaudiocodec.h>
 
-int At3_Sample_Per_Frame[2] = { 1024, 2048 };
+const int At3_Sample_Per_Frame[2] = { 1024, 2048 };
 
 /* -----------------------------------------------------------------
 	AT3デコードの為の初期化

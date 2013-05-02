@@ -5,7 +5,7 @@ int DrawLine3D(VECTOR pos1,VECTOR pos2,int color)
 {
 	GUSTART;
 	dxpGraphicsSetup3D(color);
-	DXP_FVF_3D *vtx = dxpGuGetMemory(sizeof(DXP_FVF_3D) * 2);
+	DXP_FVF_3D *vtx = (DXP_FVF_3D*)dxpGuGetMemory(sizeof(DXP_FVF_3D) * 2);
 	if(!vtx)return -1;
 	vtx[0].x = pos1.x;
 	vtx[0].y = pos1.y;

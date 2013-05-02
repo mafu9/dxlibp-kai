@@ -15,7 +15,13 @@ void *__wrap_calloc(size_t n, size_t size);
 void *__wrap_memalign(size_t align, size_t size);
 void __wrap_free(void *ptr);
 
-DXPMEMORYDATA dxpMemoryData = {0, 1, -1, 0};
+DXPMEMORYDATA dxpMemoryData =
+{
+    .init = 0,
+    .memAssert = 1,
+    .mutexHandle = -1,
+    .totalMemSize = 0
+};
 
 int dxpMemoryInit(void)
 {

@@ -26,7 +26,7 @@
 #define AT3_TYPE_ATRAC3			0
 #define AT3_TYPE_ATRAC3PLUS		1
 
-extern int At3_Sample_Per_Frame[2];
+extern const int At3_Sample_Per_Frame[2];
 
 #define SHND2PTR(HNDLE,PTR) {if(!dxpSoundData.init)return -1; if(HNDLE < 0 || HNDLE >= DXP_BUILDOPTION_SOUNDHANDLE_MAX)return -1;PTR = dxpSoundArray + HNDLE;if(!PTR->used)return -1;}
 

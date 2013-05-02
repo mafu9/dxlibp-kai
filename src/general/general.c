@@ -2,15 +2,15 @@
 
 DXPGENERALDATA dxpGeneralData =
 {
-	0,
+	.initialized = 0,
 
-	0,
-	0,
-	0,
-	0,
+	.homebutton_callback_initialized = 0,
+	.homebutton_pushed = 0,
+	.exit_called = 0,
+	.homebutton_callback_threadid = -1,
 
-	0,
-	0,
+	.randmode = 0,
+	.mt19937context = NULL,
 
-	DXP_CP_SJIS,
+	.charset = DXP_CP_SJIS
 };

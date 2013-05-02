@@ -6,8 +6,8 @@
 
 //JPEG保存時の設定
 JPEGSETTING dxpjpegsetting = {
-	100,
-	0,
+	.jquality = 100,
+	.progression = 0,
 };
 
 //DXPの内部でディスプレイバッファのアドレスを記録してた気がするけど...
@@ -15,16 +15,18 @@ JPEGSETTING dxpjpegsetting = {
 int SaveScreen(const char *filename, int type)
 {
 	GUINITCHECK;
+	GUSYNC;
 
 	sceIoRemove(filename);
 	FILE *fp = fopen(filename, "wb");
-    if ( fp == NULL ) return -1;
+	if ( fp == NULL ) return -1;
 
 	u32* vram32 = NULL;
 	u16* vram16 = NULL;
 	int bufferwidth, pixelformat;
 
 	sceDisplayGetFrameBuf((void*)&vram32, &bufferwidth, &pixelformat, 0);
+//	vram32 = (u32*)((u32)GetDisplaybufferAddress() | VRAM_BASE);
 	vram16 = (u16*)vram32;
 
 	switch(type) {
@@ -185,7 +187,7 @@ int SaveScreen(const char *filename, int type)
 			unsigned int line_size = SCREEN_WIDTH * (SaveBit >> 3);
 			if ( (line_size % 4) != 0 ) line_size = ((line_size >> 2) + 1) << 2;
 			
-			char magic[2] = "BM";
+			const char *magic = "BM";
 			fwrite(&magic, 1, 2, fp);
 
 			//bitmap header

@@ -29,7 +29,7 @@ int dxpShowDialog(pspUtilityMsgDialogParams *params)
 	while(ProcessMessage() != -1 && !done)
 	{
 		ClearDrawScreen();
-		if ( dxpDialogDrawScene != NULL ) dxpDialogDrawScene();			
+		if ( dxpDialogDrawScene != NULL ) dxpDialogDrawScene();
 		GUFINISH
 		switch(sceUtilityMsgDialogGetStatus())
 		{
@@ -71,13 +71,16 @@ int ShowTextDialog(const char *text,int options)
 	params.options = options;
 
 	if ( dxpGeneralData.charset == DXP_CP_UTF8 ) {
-		strncpy( params.message, text, strlen(text) < 512 ? strlen(text) : 512 );
+		strncpy( params.message, text, 512 );
 	} else if ( dxpGeneralData.charset == DXP_CP_SJIS ) {
-		char utf8[512]; sjis_to_utf8((void*)utf8, (void*)text); utf8[511] = '\0';
+		char utf8[512];
+		sjis_to_utf8((void*)utf8, (void*)text);
+		utf8[511] = '\0';
 		strcpy( params.message, utf8 );
 	} else {
-		strncpy( params.message, text, strlen(text) < 512 ? strlen(text) : 512 );
+		strncpy( params.message, text, 512 );
 	}
+	params.message[511] = 0;
 
 	return dxpShowDialog(&params);
 }

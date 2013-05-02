@@ -34,10 +34,10 @@ int ConvertGraphFormat(int gh,int psm)
 		dest = malloc(dxpGraphicsCalcTexSize(texptr->pitch,texptr->height,texptr->psm));
 		if(!dest)return -1;
 	}
-	src16 = src;
-	dest16 = dest;
-	src32 = src;
-	dest32 = dest;
+	src16 = (u16*)src;
+	dest16 = (u16*)dest;
+	src32 = (u32*)src;
+	dest32 = (u32*)dest;
 
 	size = texptr->width * texptr->height;
 

@@ -28,37 +28,37 @@ u8 dxpPsm2SliceSize[11][2]
 
 DXPGRAPHICSDATA dxpGraphicsData = 
 {
-	0,
-	GU_PSM_8888,
-	{},
-	NULL,
-	{},
-	NULL,
-	NULL,
+	.init = 0,
+	.display_psm = GU_PSM_8888,
+	.displaybuffer = {},
+	.displaybuffer_back = NULL,
+	.depthbuffer = {},
+	.rendertarget = NULL,
+	.texture = NULL,
 
-	NULL,
+	.debugScreenCallback = NULL,
 
-	0,
-	0,
-	0,
+	.clear_color_value = 0,
+	.clear_depth_value = 0,
+	.clear_stencil_value = 0,
 
-	0,
-	0,
-	0,
-	0,
-	1,
-	1,
-	0,
-	0,
-	1,
+	.gustarted = 0,
+	.clear_depth = 0,
+	.clear_stencil = 0,
+	.bilinear_enable = 0,
+	.create_vram_graph = 1,
+	.create_swizzled_graph = 1,
+	.usestencil = 0,
+	.writestencil = 0,
+	.waitvsinc = 1,
 
-	0,
-	DX_BLENDMODE_NOBLEND,
-	DXP_DRAWSTATE_EITHER,
-	0,
-	1,
-	0,
-	0xffffffff,
+	.colorkey = 0,
+	.blendmode = DX_BLENDMODE_NOBLEND,
+	.drawstate = DXP_DRAWSTATE_EITHER,
+	.flag = 0,
+	.forceupdate = 1,
+	.z_2d = 0,
+	.color = 0xffffffff,
 
 };
 
@@ -226,6 +226,7 @@ int dxpGraphicsEnd()
 
 int DeleteGraph(int gh)
 {
+	GUINITCHECK;
 	if(gh < 0 || gh >= DXP_BUILDOPTION_GHANDLE_MAXNUM)return -1;
 	dxpGraphicsData.forceupdate = 1;
 	return dxpGraphicsReleseGraphicHandle(dxpGraphicsData.grapharray[gh]);
@@ -587,7 +588,7 @@ void *GetFramebufferAddress()
 
 void *GetDisplaybufferAddress()
 {
-	return dxpGraphicsData.displaybuffer_back == dxpGraphicsData.displaybuffer ? dxpGraphicsData.displaybuffer[1].texvram : dxpGraphicsData.displaybuffer[0].texvram;
+	return (dxpGraphicsData.displaybuffer_back == dxpGraphicsData.displaybuffer) ? dxpGraphicsData.displaybuffer[1].texvram : dxpGraphicsData.displaybuffer[0].texvram;
 }
 
 

@@ -69,7 +69,7 @@ static int dxpSaveDialogInit(
 	savedata->base.fontThread = 0x12;
 	savedata->base.soundThread = 0x10;
 
-	savedata->mode = mode;
+	savedata->mode = (PspUtilitySavedataMode)mode;
 	savedata->overwrite = 1;
 
 	//最近セーブしたファイルにフォーカス
@@ -80,12 +80,15 @@ static int dxpSaveDialogInit(
 	strncpy(savedata->key, key, 16);
 #endif
 	
-	strcpy(savedata->gameName, GameName);
-	strcpy(savedata->saveName, SaveName);
+	strncpy(savedata->gameName, GameName, 13);
+	savedata->gameName[12] = 0;
+	strncpy(savedata->saveName, SaveName, 20);
+	savedata->saveName[19] = 0;
 	
 	savedata->saveNameList = nameMultiple;
 
-	strcpy(savedata->fileName, DXP_SAVE_DATANAME);
+	strncpy(savedata->fileName, DXP_SAVE_DATANAME, 13);
+	savedata->fileName[12] = 0;
 
 	if ( size != 0 ) {
 		savedata->dataBuf = malloc(size);
@@ -107,9 +110,12 @@ static int dxpSaveDialogInit(
 
 		
 		if ( dxpGeneralData.charset == DXP_CP_UTF8 ) {
-			strncpy(savedata->sfoParam.title, GameTitle, strlen(GameTitle) < 128 ? strlen(GameTitle) : 128);
-			strncpy(savedata->sfoParam.savedataTitle, SaveTitle, strlen(SaveTitle) < 128 ? strlen(SaveTitle) : 128);
-			strncpy(savedata->sfoParam.detail, SaveDetail, strlen(SaveDetail) < 1024 ? strlen(SaveDetail) : 1024);
+			strncpy(savedata->sfoParam.title, GameTitle, 128);
+			strncpy(savedata->sfoParam.savedataTitle, SaveTitle, 128);
+			strncpy(savedata->sfoParam.detail, SaveDetail, 1024);
+			savedata->sfoParam.title[127] = 0;
+			savedata->sfoParam.savedataTitle[127] = 0;
+			savedata->sfoParam.detail[1023] = 0;
 			savedata->sfoParam.parentalLevel = 1;
 		} else if ( dxpGeneralData.charset == DXP_CP_SJIS ) {
 			//128byte
@@ -150,10 +156,10 @@ static int dxpSaveDialogInit(
 		savedata->snd0FileData.bufSize = dxp_save_resource[DXP_SAVE_RESOURCE_SND0].size;
 		savedata->snd0FileData.size = dxp_save_resource[DXP_SAVE_RESOURCE_SND0].size;
 
-		char* new_title = "新規作成";
+		const char* new_title = "新規作成";
 		char new_title_utf8[20];
 
-		sjis_to_utf8((void*)new_title_utf8, (void*)new_title);
+		sjis_to_utf8((void*)new_title_utf8, (const void*)new_title);
 		new_title_utf8[19] = '\0';
 		newData.title = new_title_utf8;
 		savedata->newData = &newData;
@@ -198,10 +204,10 @@ int ShowSaveDialog(
 	if ( dxpSaveDialogInit(&dialog, mode, buf, size, GameName, "0000", NameList, GameTitle, SaveTitle, SaveDetail) < 0 )
 		return -1;
 
-    if ( sceUtilitySavedataInitStart(&dialog) != 0 ) return -1;
+	if ( sceUtilitySavedataInitStart(&dialog) != 0 ) return -1;
 	int done = 0;
 
-    while( ProcessMessage() != -1 && !done )
+	while( ProcessMessage() != -1 && !done )
 	{
 		if ( mode != PSP_UTILITY_SAVEDATA_AUTOSAVE ) {
 			ClearDrawScreen();
@@ -212,16 +218,16 @@ int ShowSaveDialog(
 		case PSP_UTILITY_DIALOG_INIT:
 			break;
 		case PSP_UTILITY_DIALOG_VISIBLE:
-		    sceUtilitySavedataUpdate(1);
-		    break;
-		case PSP_UTILITY_DIALOG_QUIT:
-		    sceUtilitySavedataShutdownStart();
-		    break;
-		case PSP_UTILITY_DIALOG_FINISHED:
-            done = 1;
+			sceUtilitySavedataUpdate(1);
 			break;
-        case PSP_UTILITY_DIALOG_NONE:
-            done = 1;
+		case PSP_UTILITY_DIALOG_QUIT:
+			sceUtilitySavedataShutdownStart();
+			break;
+		case PSP_UTILITY_DIALOG_FINISHED:
+			done = 1;
+			break;
+		case PSP_UTILITY_DIALOG_NONE:
+			done = 1;
 		default:
 			break;
 		}
@@ -231,30 +237,30 @@ int ShowSaveDialog(
 	
 	memset(dxp_save_resource, 0, sizeof(PspUtilitySavedataFileData) * 4);
 
+	int ret;
+
 	if ( mode == DXP_SAVE_MODE_LOAD ) {
 		//正常に読み込んだ
 		//if(dialog.unknown1 != 0)
 		//if(dialog.unknown1 == 1021)
 		if ( dialog.base.result == 0 ) {
 			memcpy(buf, dialog.dataBuf, size);
-			free(dialog.dataBuf);
-			return 0;
+			ret = 0;
 		}
 		//キャンセルされた
 		else if ( dialog.base.result == 1 ) {
 			memset(buf, 0x0, size);
-			free(dialog.dataBuf);
-			return -2;
+			ret = -2;
 		}
 		//セーブデータが存在しなかった
 		//else if(dialog.base.result == -2146368761)
 		else {
 			memset(buf, 0x0, size);
-			free(dialog.dataBuf);
-			return -3;
+			ret = -3;
 		}
 	} else {
-		free(dialog.dataBuf);
-		return 0;
+		ret = 0;
 	}
+	free(dialog.dataBuf);
+	return ret;
 }

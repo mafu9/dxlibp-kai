@@ -6,7 +6,9 @@
 #include <stdlib.h>
 
 int SaveGraph(int gh, const char *filename, int type)
-{	
+{
+	int ret = -1;
+
 	GUINITCHECK;
 	DXPGRAPHICSHANDLE* gptr;
 	GHANDLE2GPTR(gptr,gh);
@@ -159,24 +161,24 @@ int SaveGraph(int gh, const char *filename, int type)
 			//bitmap header
 			DXP_BMP_HEADER bitmap_header = {
 				/* file header */
-				(line_size * destheight) + BMP_HEADER_SIZE,
-				0,
-				0,
-				BMP_HEADER_SIZE,
+				.file_size = (line_size * destheight) + BMP_HEADER_SIZE,
+				.reserved1 = 0,
+				.reserved2 = 0,
+				.offset = BMP_HEADER_SIZE,
 				/* info header */
-				40,
-				(int)destwidth,
-				(int)destheight,
-				1,
-				SaveBit,
-				0,
-				destwidth * destheight * (SaveBit >> 3),
-				0xEC4,
-				0xEC4,
-				0,
-				0
+				.info_header_size = 40,
+				.width = (s32)destwidth,
+				.height = (s32)destheight,
+				.planes = 1,
+				.bit = SaveBit,
+				.compressin = 0,
+				.image_size = destwidth * destheight * (SaveBit >> 3),
+				.x_px = 0xEC4,
+				.y_px = 0xEC4,
+				.palette = 0,
+				.color = 0
 			};
-			
+
 			fwrite(&magic, 1, 2, fp);
 			fwrite(&bitmap_header, 1, sizeof(DXP_BMP_HEADER), fp);
 	
@@ -225,13 +227,11 @@ int SaveGraph(int gh, const char *filename, int type)
 		goto err;
 	}
 
-	fclose(fp);
-	if ( swizzleflag ) SwizzleGraph(gptr->handle);
-	return 0;
+	ret = 0;
 
 err:
 	fclose(fp);
 	if ( swizzleflag ) SwizzleGraph(gptr->handle);
-	return -1;
+	return ret;
 
 }

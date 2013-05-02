@@ -6,7 +6,7 @@ int dxpCpSJIS_fromUcs2(dxpChar *dst,u32 count,const dxpUcs2 *src)
 	if(!src || !dst || !count)return 0;
 	if (!dxpCpData.init) dxpCpInit();
 	if(!dxpCpData.table[DXP_CP_SJIS][1].used)dxpCpLoadTable(DXPCPTABLE_FILENAME,DXP_CP_SJIS,DXPCP_FROMUCS2);
-	
+
 	int i = 0, dstpos = 0,length = 0, j, code, id;
 	unsigned char tmp[2];
 	unsigned short *ptmp = (unsigned short*)tmp;
