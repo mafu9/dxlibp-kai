@@ -16,8 +16,9 @@ For more details of based libraries, please see the doc directory.
 
 ### Differences from based libraries
 
-* Support OGG audio format
-* malloc is Thread-safe
+* Support OGG audio format if DXP_BUILDOPTION_USE_LIBOGG is defined
+* malloc and FileRead_* functions are thread-safe
+* Support mutex
 
 To use this library,
 

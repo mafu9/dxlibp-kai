@@ -18,6 +18,15 @@ OBJS += general/sleep.o
 OBJS += general/setmultithreadflag.o
 OBJS += general/setalwaysrunflag.o
 
+#mutex functions
+OBJS += mutex/mutexutils.o
+OBJS += mutex/createmutex.o
+OBJS += mutex/deletemutex.o
+OBJS += mutex/lockmutex.o
+OBJS += mutex/trylockmutex.o
+OBJS += mutex/unlockmutex.o
+OBJS += mutex/getmutexcount.o
+
 #memory functions
 OBJS += memory/memutils.o
 OBJS += memory/getmemoryfreesize.o

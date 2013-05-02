@@ -19,6 +19,7 @@ int FileRead_open(const char* filename,int async)
 		{
 			FCRITICALSECTION_LOCK(i + 1);
 			if(!dxpFileioData.handleArray[i].used)break;
+			FCRITICALSECTION_UNLOCK(i + 1);
 		}
 	}
 	if(i >= DXP_BUILDOPTION_FILEHANDLE_MAX)

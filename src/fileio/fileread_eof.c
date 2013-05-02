@@ -2,6 +2,7 @@
 
 int FileRead_eof(int filehandle)
 {
+	int ret;
 	DXPFILEIOHANDLE *pHnd;
 	if(!dxpFileioData.init)return -1;
 	FCRITICALSECTION_LOCK(filehandle);
@@ -10,7 +11,12 @@ int FileRead_eof(int filehandle)
 	if(pHnd->pos >= pHnd->size)
 	{
 		pHnd->pos = pHnd->size;
-		return 1;
+		ret = 1;
 	}
-	return 0;
+	else
+	{
+		ret = 0;
+	}
+	FCRITICALSECTION_UNLOCK(filehandle);
+	return ret;
 }

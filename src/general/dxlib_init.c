@@ -1,9 +1,10 @@
 #include "../general.h"
+#include "../mutex.h"
+#include "../memory.h"
 #include "../fileio.h"
 #include "../sound.h"
 #include "../input.h"
 #include "../graphics.h"
-#include "../memory.h"
 #include <stdlib.h>
 #include <time.h>
 
@@ -41,6 +42,7 @@ int DxLib_Init()
 {
 	if(dxpGeneralData.initialized)return 0;
 
+	if(dxpMutexInit() < 0)return -1;
 	if(dxpMemoryInit() < 0)return -1;
 	if(!dxpGeneralData.homebutton_callback_initialized)
 	{

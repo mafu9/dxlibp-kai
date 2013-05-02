@@ -1,3 +1,4 @@
+#include "../mutex.h"
 #include "../memory.h"
 
 unsigned int GetMemoryFreeSize(int fast)
@@ -6,7 +7,7 @@ unsigned int GetMemoryFreeSize(int fast)
 	unsigned int bufSize = 20 * 1024 * 1024, freeSize = 0;
 	DXPMEMORYLIST *top = NULL, *curr = NULL, *prev = NULL, *next = NULL;
 
-	dxpMemoryLock();
+	LockMutex(dxpMemoryData.mutexHandle);
 
 	while(1)
 	{
@@ -34,7 +35,7 @@ unsigned int GetMemoryFreeSize(int fast)
 		free(curr);
 	}
 
-	dxpMemoryUnlock();
+	UnlockMutex(dxpMemoryData.mutexHandle);
 
 	return freeSize;
 }

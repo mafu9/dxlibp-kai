@@ -1,10 +1,11 @@
+#include "../mutex.h"
 #include "../memory.h"
 
 int SetMemoryAssertFlag(int flag)
 {
-	dxpMemoryLock();
+	LockMutex(dxpMemoryData.mutexHandle);
 	dxpMemoryData.memAssert = flag;
-	dxpMemoryUnlock();
+	UnlockMutex(dxpMemoryData.mutexHandle);
 	return 0;
 }
 

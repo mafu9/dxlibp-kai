@@ -95,11 +95,15 @@ int dxpFileioOpenOnMemory(const void *buffer, u32 size)
 	int i;
 	if(!dxpFileioData.init)return 0;
 	for(i = 0;i < DXP_BUILDOPTION_FILEHANDLE_MAX;++i)
-		if(!dxpFileioData.handleArray[i].used)break;
-	if(i >= DXP_BUILDOPTION_FILEHANDLE_MAX)
 	{
-		return 0;
+		if(!dxpFileioData.handleArray[i].used)
+		{
+			FCRITICALSECTION_LOCK(i + 1);
+			if(!dxpFileioData.handleArray[i].used)break;
+			FCRITICALSECTION_UNLOCK(i + 1);
+		}
 	}
+	if(i >= DXP_BUILDOPTION_FILEHANDLE_MAX)return 0;
 	pHnd = &dxpFileioData.handleArray[i];
 	strcpy(pHnd->filename, "@mem");
 	pHnd->used = 1;
@@ -107,6 +111,7 @@ int dxpFileioOpenOnMemory(const void *buffer, u32 size)
 	pHnd->pos = 0;
 	pHnd->dat = buffer;
 	pHnd->size = size;
+	FCRITICALSECTION_UNLOCK(i + 1);
 	return i + 1;
 }
 

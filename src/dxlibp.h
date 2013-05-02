@@ -16,6 +16,7 @@
 #include <pspuser.h>
 
 /*DXPのコンパイルオプション*/
+#define DXP_BUILDOPTION_MUTEXHANDLE_MAX		32		//Mutex系関数で同時に開けるミューテックスの数
 #define DXP_BUILDOPTION_FILEHANDLE_MAX		32		//FileRead系関数で同時に開けるファイルハンドルの数
 #define DXP_BUILDOPTION_FILENAMELENGTH_MAX	260		//FileRead系関数で使えるファイル名の長さ
 #define DXP_BUILDOPTION_TEXTURE_MAXNUM		512		//DXPが内部で持つテクスチャの最大枚数
@@ -810,6 +811,57 @@ static inline MATRIX MTranspose(MATRIX m){__asm__ volatile ("ulv.q R000,0  + %0\
 */
 static inline MATRIX MInverse(MATRIX m){register float d;__asm__ volatile ("ulv.q R200,0  + %1\nulv.q R201,16 + %1\nulv.q R202,32 + %1\nulv.q R203,48 + %1\nvmul.q R100,R201[y,x,x,x],R202[z,z,y,y]\nvmul.q R100,R203[w,w,w,z],R100\nvmul.q R101,R201[z,z,y,y],R202[w,w,w,z]\nvmul.q R101,R203[y,x,x,x],R101\nvadd.q R100,R100,R101\nvmul.q R101,R201[w,w,w,z],R202[y,x,x,x]\nvmul.q R101,R203[z,z,y,y],R101\nvadd.q R100,R100,R101\nvmul.q R101,R203[y,x,x,x],R202[z,z,y,y]\nvmul.q R101,R201[w,w,w,z],R101\nvsub.q R100,R100,R101\nvmul.q R101,R203[z,z,y,y],R202[w,w,w,z]\nvmul.q R101,R201[y,x,x,x],R101\nvsub.q R100,R100,R101\nvmul.q R101,R203[w,w,w,z],R202[y,x,x,x]\nvmul.q R101,R201[z,z,y,y],R101\nvsub.q R100,R100,R101\nvdot.q S101,R100,R200[x,-y,z,-w]\nvabs.s S102,S101\nmfv %0,S102\n":"=r"(d):"m"(m));if(d < 0.00001f){__asm__ volatile("vmidt.q M000\nusv.q R000,0  + %0\nusv.q R001,16 + %0\nusv.q R002,32 + %0\nusv.q R003,48 + %0\n":"=m"(m));return m;}__asm__ volatile("vrcp.s S101,S101\nvscl.q C000,R100[x,-y,z,-w],S101\nvmul.q R102,R200[y,x,x,x],R203[w,w,w,z]\nvmul.q R103,R203[y,x,x,x],R200[w,w,w,z]\nvsub.q R102,R102,R103\nvmul.q C010,R102,R202[z,z,y,y]\nvmul.q R102,R200[z,z,y,y],R203[y,x,x,x]\nvmul.q R103,R203[z,z,y,y],R200[y,x,x,x]\nvsub.q R102,R102,R103\nvmul.q R102,R102,R202[w,w,w,z]\nvadd.q C010,C010,R102\nvmul.q R102,R200[w,w,w,z],R203[z,z,y,y]\nvmul.q R103,R203[w,w,w,z],R200[z,z,y,y]\nvsub.q R102,R102,R103\nvmul.q R102,R102,R202[y,x,x,x]\nvadd.q C010,C010,R102\nvscl.q C010,C010[-x,y,-z,w],S101\nvmul.q R102,R200[y,x,x,x],R203[w,w,w,z]\nvmul.q R103,R203[y,x,x,x],R200[w,w,w,z]\nvsub.q R102,R102,R103\nvmul.q C020,R102,R201[z,z,y,y]\nvmul.q R102,R200[z,z,y,y],R203[y,x,x,x]\nvmul.q R103,R203[z,z,y,y],R200[y,x,x,x]\nvsub.q R102,R102,R103\nvmul.q R102,R102,R201[w,w,w,z]\nvadd.q C020,C020,R102\nvmul.q R102,R200[w,w,w,z],R203[z,z,y,y]\nvmul.q R103,R203[w,w,w,z],R200[z,z,y,y]\nvsub.q R102,R102,R103\nvmul.q R102,R102,R201[y,x,x,x]\nvadd.q C020,C020,R102\nvscl.q C020,C020[x,-y,z,-w],S101\nvmul.q R102,R200[y,x,x,x],R202[w,w,w,z]\nvmul.q R103,R202[y,x,x,x],R200[w,w,w,z]\nvsub.q R102,R102,R103\nvmul.q C030,R102,R201[z,z,y,y]\nvmul.q R102,R200[z,z,y,y],R202[y,x,x,x]\nvmul.q R103,R202[z,z,y,y],R200[y,x,x,x]\nvsub.q R102,R102,R103\nvmul.q R102,R102,R201[w,w,w,z]\nvadd.q C030,C030,R102\nvmul.q R102,R200[w,w,w,z],R202[z,z,y,y]\nvmul.q R103,R202[w,w,w,z],R200[z,z,y,y]\nvsub.q R102,R102,R103\nvmul.q R102,R102,R201[y,x,x,x]\nvadd.q C030,C030,R102\nvscl.q C030,C030[-x,y,-z,w],S101\nusv.q R000,0  + %0\nusv.q R001,16 + %0\nusv.q R002,32 + %0\nusv.q R003,48 + %0\n":"=m"(m));return m;}
 
+/*@}*/
+
+/** @defgroup ミューテックス関連*/
+/*@{*/
+/**
+ * ミューテックスを作成する。
+ * 
+ * @param MutexName ミューテックスの名前
+ * @return ミューテックスハンドル
+ * @retval -1 失敗
+*/
+int CreateMutex(const char *MutexName);
+/**
+ * ミューテックスを削除する。
+ * 
+ * @param mh ミューテックスハンドル
+ * @retval 0 成功
+ * @retval -1 失敗
+*/
+int DeleteMutex(int mh);
+/**
+ * ミューテックスをロックする。(ロックできるまで待機)
+ * 
+ * @param mh ミューテックスハンドル
+ * @retval 0 成功
+ * @retval -1 失敗
+*/
+int LockMutex(int mh);
+/**
+ * ミューテックスをロックしようと試みる。(ロックできなかったら失敗)
+ * 
+ * @param mh ミューテックスハンドル
+ * @retval 0 成功
+ * @retval -1 失敗
+*/
+int TryLockMutex(int mh);
+/**
+ * ミューテックスをアンロックする。
+ * 
+ * @param mh ミューテックスハンドル
+ * @retval 0 成功
+ * @retval -1 失敗
+*/
+int UnlockMutex(int mh);
+/**
+ * 同一スレッドからロックされている回数を取得する。
+ * 
+ * @param mh ミューテックスハンドル
+ * @return ロックされている回数
+*/
+int GetMutexCount(int mh);
 /*@}*/
 
 /** @defgroup 入力関連*/
