@@ -48,8 +48,8 @@ int dxpFileioReopen(DXPFILEIOHANDLE *pHnd);
 int dxpFileioOpenOnMemory(const void *buffer, u32 size);
 
 
-#define FCRITICALSECTION_LOCK(HANDLE) sceKernelWaitEventFlag(dxpFileioData.eventFlags[(HANDLE) / 32 - 1], 1 << ((HANDLE) % 32), PSP_EVENT_WAITAND|PSP_EVENT_WAITCLEAR, NULL, NULL)
-#define FCRITICALSECTION_UNLOCK(HANDLE) sceKernelSetEventFlag(dxpFileioData.eventFlags[(HANDLE) / 32 - 1], 1 << ((HANDLE) % 32))
+#define FCRITICALSECTION_LOCK(HANDLE) sceKernelWaitEventFlag(dxpFileioData.eventFlags[((HANDLE) - 1) / 32], 1 << ((HANDLE) % 32), PSP_EVENT_WAITAND|PSP_EVENT_WAITCLEAR, NULL, NULL)
+#define FCRITICALSECTION_UNLOCK(HANDLE) sceKernelSetEventFlag(dxpFileioData.eventFlags[((HANDLE) - 1) / 32], 1 << ((HANDLE) % 32))
 #define FHANDLE2PTR(PTR,HANDLE)												\
 {																			\
 	if(HANDLE <= 0 || HANDLE > DXP_BUILDOPTION_FILEHANDLE_MAX)return -1;	\
