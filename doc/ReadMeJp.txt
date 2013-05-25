@@ -28,6 +28,7 @@ PSP用のDXライブラリです。
   * DX_SOUNDDATATYPE_MEMPRESS に対応
   * ファイル読み込み系関数(FileRead_***)をスレッドセーフに
   * ミューテックスを追加
+  * FileRead_open で実質ファイルが9個までしか開けなかったバグを修正
   詳しくは GitHub のコミットログ(https://github.com/mafu9/dxlibp-kai/commits/)などを読んでください。
 
 

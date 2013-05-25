@@ -19,21 +19,20 @@ For more details of based libraries, please see the doc directory.
 * Support OGG audio format if DXP_BUILDOPTION_USE_LIBOGG is defined
 * malloc and FileRead_* functions are thread-safe
 * Support mutex
+* Enable to open more than 9 files
 
 To use this library,
-
-* DxLib_Init function must be called before malloc
 
 * libvorbisidec and libogg need to be linked if DXP_BUILDOPTION_USE_LIBOGG is defined
 
 ```
-LIBS = dxlibp.a -lvorbisidec -logg -ljpeg -lpng -lpspgum -lpspgu -lz -lm -lpsprtc -lpspaudio -lpspaudiocodec -lpsputility -lpspvalloc -lpsppower
+LIBS += dxlibp.a -lvorbisidec -logg -ljpeg -lpng -lpspgum -lpspgu -lz -lm -lpsprtc -lpspaudio -lpspaudiocodec -lpsputility -lpspvalloc -lpsppower
 ```
 
 * Set LDFLAGS
 
 ```
-LDFLAGS = -Wl,--wrap,malloc -Wl,--wrap,realloc -Wl,--wrap,calloc -Wl,--wrap,memalign -Wl,--wrap,free
+LDFLAGS += -Wl,--wrap,malloc -Wl,--wrap,realloc -Wl,--wrap,calloc -Wl,--wrap,memalign -Wl,--wrap,free
 ```
 
 * The following copyright needs to be added:
