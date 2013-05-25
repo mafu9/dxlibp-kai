@@ -3,7 +3,7 @@
 int	FileRead_read(void *buffer,int readsize,int filehandle)
 {
 	DXPFILEIOHANDLE *pHnd;
-	int retread;
+	int retread = -1;
 	if(!dxpFileioData.init)return -1;
 	FHANDLE2PTR(pHnd,filehandle);
 	if(pHnd->onmemory)
@@ -15,16 +15,12 @@ int	FileRead_read(void *buffer,int readsize,int filehandle)
 	}
 	else
 	{
-		if(dxpFileioData.sleep)
+		SceUID fd = dxpSceIoReopen(pHnd);
+		if(fd >= 0)
 		{
-			if(dxpFileioReopen(pHnd) < 0)
-			{
-				FCRITICALSECTION_UNLOCK(filehandle);
-				return -1;
-			}
+			retread = sceIoRead(fd,buffer,readsize);
+			pHnd->pos += retread;
 		}
-		retread = sceIoRead(pHnd->fd,buffer,readsize);
-		pHnd->pos += retread;
 	}
 	FCRITICALSECTION_UNLOCK(filehandle);
 	return retread;

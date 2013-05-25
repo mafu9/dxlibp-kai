@@ -10,36 +10,21 @@ int FileRead_getc(int filehandle)
 	{
 		int ret;
 		if(pHnd->pos >= pHnd->size)
-		{
 			pHnd->pos = pHnd->size;
-			ret = -1;
-		}
 		else
-		{
 			ret = (int)((const u8*)pHnd->dat)[pHnd->pos++];
-		}
 	}
 	else
 	{
-		if(dxpFileioData.sleep)
+		SceUID fd = dxpSceIoReopen(pHnd);
+		if(fd >= 0)
 		{
-			if(dxpFileioReopen(pHnd) < 0)
+			char c;
+			if(sceIoRead(fd,&c,1) == 1)
 			{
-				FCRITICALSECTION_UNLOCK(filehandle);
-				return -1;
+				pHnd->pos += 1;
+				ret = (int)c;
 			}
-		}
-		char c;
-		int status;
-		status = sceIoRead(dxpFileioData.handleArray[filehandle].fd,&c,1);
-		if(status != 1)
-		{
-			ret = -1;
-		}
-		else
-		{
-			pHnd->pos += 1;
-			ret = (int)c;
 		}
 	}
 	FCRITICALSECTION_UNLOCK(filehandle);

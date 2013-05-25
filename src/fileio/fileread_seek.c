@@ -2,56 +2,36 @@
 
 int	FileRead_seek(int filehandle,int offset,int origin)
 {
-	int res, ret;
+	int ret = 0;
 	DXPFILEIOHANDLE *pHnd;
 	if(origin < 0 || origin > 2)return -1;
 	if(!dxpFileioData.init)return -1;
 	FHANDLE2PTR(pHnd,filehandle);
-	if(pHnd->onmemory)
+	switch(origin)
 	{
-		int target = 0;
-		switch(origin)
-		{
-		case SEEK_CUR:
-			target = pHnd->pos;
-			break;
-		case SEEK_SET:
-			target = 0;
-			break;
-		case SEEK_END:
-			target = pHnd->size;
-			break;
-		default:
-			FCRITICALSECTION_UNLOCK(filehandle);
-			return -1;
-		}
-		target += offset;
-		if(target < 0)target = 0;
-		if(target > pHnd->size)target = pHnd->size;
-		pHnd->pos = target;
-		ret = 0;
+	case SEEK_CUR:
+		offset += pHnd->pos;
+		break;
+	case SEEK_SET:
+		break;
+	case SEEK_END:
+		offset+= pHnd->size;
+		break;
+	default:
+		FCRITICALSECTION_UNLOCK(filehandle);
+		return -1;
 	}
-	else
+	if(offset < 0)offset = 0;
+	if(offset > pHnd->size)offset = pHnd->size;
+	if(!pHnd->onmemory && pHnd->pos != offset)
 	{
-		if(dxpFileioData.sleep)
+		SceUID fd = dxpSceIoFindFd(pHnd);
+		if(fd >= 0)
 		{
-			if(dxpFileioReopen(pHnd) < 0)
-			{
-				FCRITICALSECTION_UNLOCK(filehandle);
-				return -1;
-			}
-		}
-		res = sceIoLseek32(pHnd->fd,offset,origin);
-		if(res < 0)
-		{
-			ret = -1;
-		}
-		else
-		{
-			pHnd->pos = res;
-			ret = 0;
+			if(sceIoLseek32(fd,offset,SEEK_SET) < 0)ret = -1;
 		}
 	}
+	pHnd->pos = offset;
 	FCRITICALSECTION_UNLOCK(filehandle);
 	return ret;
 }
