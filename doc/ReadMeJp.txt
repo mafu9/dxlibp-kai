@@ -58,8 +58,6 @@ DX Library Portable Copyright (C) 2008-2010 Kawai Yuichi.
 
 zlib
 Copyright (c) 1995-2004 Jean-loup Gailly and Mark Adler.
-※ ただし dxlibp.h で「#define DXP_BUILDOPTION_USE_LIBPNG」をコメントアウトして
-   このライブラリをコンパイルした場合は無しで大丈夫です。
 
 
 libpng
