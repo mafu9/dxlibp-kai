@@ -4,7 +4,6 @@ int	FileRead_seek(int filehandle,int offset,int origin)
 {
 	int ret = 0;
 	DXPFILEIOHANDLE *pHnd;
-	if(origin < 0 || origin > 2)return -1;
 	if(!dxpFileioData.init)return -1;
 	FHANDLE2PTR(pHnd,filehandle);
 	switch(origin)
@@ -26,10 +25,7 @@ int	FileRead_seek(int filehandle,int offset,int origin)
 	if(!pHnd->onmemory && pHnd->pos != offset)
 	{
 		SceUID fd = dxpSceIoFindFd(pHnd);
-		if(fd >= 0)
-		{
-			if(sceIoLseek32(fd,offset,SEEK_SET) < 0)ret = -1;
-		}
+		if(fd >= 0)offset = sceIoLseek32(fd,offset,SEEK_SET);
 	}
 	pHnd->pos = offset;
 	FCRITICALSECTION_UNLOCK(filehandle);
