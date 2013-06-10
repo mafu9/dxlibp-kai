@@ -115,7 +115,7 @@ int dxpSoundMp3Init(DXPAVCONTEXT *av)
 	av->sampleRate = dxpSoundMp3GetSampleRate(buf);
 
 	FileRead_seek(av->fileHandle,av->mp3.id3v2Pos,SEEK_SET);
-	av->mp3.avBuf = memalign(64, sizeof(DXPAVCODEC_BUFFER));
+	av->mp3.avBuf = (DXPAVCODEC_BUFFER*)memalign(64, sizeof(DXPAVCODEC_BUFFER));
 	if(!av->mp3.avBuf)return -1;
 	memset(av->mp3.avBuf,0,sizeof(DXPAVCODEC_BUFFER));
 	status = sceAudiocodecCheckNeedMem((unsigned long*)av->mp3.avBuf,PSP_CODEC_MP3);
@@ -177,7 +177,7 @@ int dxpSoundMp3Decode(DXPAVCONTEXT *av)
 	if ( frameLen < 0 ) return -1;
 	if ( av->mp3.mp3BufSize < frameLen ) {
 		free(av->mp3.mp3Buf);
-		av->mp3.mp3Buf = memalign(64, frameLen);
+		av->mp3.mp3Buf = (u8*)memalign(64, frameLen);
 		if ( !av->mp3.mp3Buf ) {
 			av->mp3.mp3BufSize = 0;
 			return -1;
@@ -193,7 +193,7 @@ int dxpSoundMp3Decode(DXPAVCONTEXT *av)
 	av->mp3.avBuf->datIn = av->mp3.mp3Buf;
 	av->mp3.avBuf->decodeByte = samplecount * 2 * 2;
 	av->mp3.avBuf->frameSize0 = av->mp3.avBuf->frameSize1 = frameLen;
-	av->mp3.avBuf->pcmOut = av->pcmOut;
+	av->mp3.avBuf->pcmOut = (u32*)av->pcmOut;
 	if ( sceAudiocodecDecode((unsigned long*)av->mp3.avBuf, PSP_CODEC_MP3) < 0 ) return -1;
 	av->nextPos += samplecount;
 	return 0;

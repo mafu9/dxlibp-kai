@@ -28,7 +28,7 @@
 
 extern const int At3_Sample_Per_Frame[2];
 
-#define SHND2PTR(HNDLE,PTR) {if(!dxpSoundData.init)return -1; if(HNDLE < 0 || HNDLE >= DXP_BUILDOPTION_SOUNDHANDLE_MAX)return -1;PTR = dxpSoundArray + HNDLE;if(!PTR->used)return -1;}
+#define SHND2PTR(HNDLE,PTR) {if(!dxpSoundData.init)return -1; if(HNDLE < 0 || HNDLE >= DXP_BUILDOPTION_SOUNDHANDLE_MAX)return -1;PTR = dxpSoundArray + HNDLE;if(!(PTR)->used)return -1;}
 
 //unsigned long * 65 byteのバッファ
 typedef struct _DXPAVCODEC_BUFFER {
@@ -52,7 +52,6 @@ typedef struct _DXPAVCONTEXT_MP3 {
 	DXPAVCODEC_BUFFER *avBuf;
 	int id3v1Pos;
 	int id3v2Pos;
-	u32 blockId;//メモリ確保に使う。
 	u8 *mp3Buf;
 	u32 mp3BufSize;
 } DXPAVCONTEXT_MP3 ;
@@ -98,7 +97,7 @@ typedef struct DXPAVCONTEXT {
 	//Uファイルサイズ
 	int fileSize;
 	//U出力先
-	u32 *pcmOut;
+	u8 *pcmOut;
 	
 	//D1サンプルのサイズ
 	u8 sampleSize;
@@ -148,7 +147,7 @@ typedef struct DXPSOUNDHANDLE
 		//DX_SOUNDDATATYPE_MEMNOPRESSで使用
 		struct {
 			int length;
-			u32 *pcmBuf;
+			u8 *pcmBuf;
 			int cmdplaytype;
 		} memnopress;
 	};
@@ -168,7 +167,6 @@ extern DXPSOUNDDATA dxpSoundData;
 extern int memnopress_handle[PSP_AUDIO_CHANNEL_MAX];
 extern int memnopress_pos[PSP_AUDIO_CHANNEL_MAX];
 extern int memnopress_playtype[PSP_AUDIO_CHANNEL_MAX];
-extern int memnopress_channel[PSP_AUDIO_CHANNEL_MAX];
 
 int dxpSoundInit();
 int dxpSoundTerm();

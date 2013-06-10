@@ -97,7 +97,7 @@ int dxpSoundWavAllDecode(DXPAVCONTEXT *av)
 	FileRead_seek(av->fileHandle, av->wav.dataPos, SEEK_SET);
 	if ( FileRead_read(av->pcmOut, av->wav.dataSize, av->fileHandle) != av->wav.dataSize ) return -1;
 
-	av->nextPos = 0;
+	av->nextPos = av->totalSampleNum;
 	return 0;
 }
 

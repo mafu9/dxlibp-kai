@@ -4,10 +4,10 @@
 #include <pspaudio.h>
 #include "../general.h"
 
-int dxpSoundThreadFunc_file(SceSize size,void* argp)
+int dxpSoundThreadFunc_file(SceSize size, void* argp)
 {
 	int channel = -1;
-	u32 *pcmBuf[2] = {NULL,NULL};
+	u8 *pcmBuf[2] = {NULL,NULL};
 	u32 pcmBufSize[2] = {0,0};
 	u8 pcm = 1;
 	DXPSOUNDHANDLE *pHnd = dxpSoundArray + *(int*)argp;
@@ -38,15 +38,16 @@ int dxpSoundThreadFunc_file(SceSize size,void* argp)
 			if ( channel < 0 ) continue;
 			
 			//バッファの確保
-			if ( pcmBufSize[pcm] < dxpSoundCalcBufferSize(&pHnd->avContext, pHnd->avContext.outSampleNum) ) {
+			if ( pcmBufSize[pcm] < dxpSoundCalcBufferSize(&pHnd->avContext, PSP_AUDIO_SAMPLE_ALIGN(pHnd->avContext.outSampleNum)) ) {
 				free(pcmBuf[pcm]);
-				pcmBuf[pcm] = memalign(64, dxpSoundCalcBufferSize(&pHnd->avContext, pHnd->avContext.outSampleNum));
+				pcmBufSize[pcm] = dxpSoundCalcBufferSize(&pHnd->avContext, PSP_AUDIO_SAMPLE_ALIGN(pHnd->avContext.outSampleNum));
+				pcmBuf[pcm] = (u8*)memalign(64, pcmBufSize[pcm]);
 				if ( !pcmBuf[pcm] ) {
 					pcmBufSize[pcm] = 0;
 					pHnd->playing = 0;
 					continue;
 				}
-				pcmBufSize[pcm] = dxpSoundCalcBufferSize(&pHnd->avContext, pHnd->avContext.outSampleNum);
+				memset(pcmBuf[pcm], 0, pcmBufSize[pcm]);
 			}
 			pHnd->avContext.pcmOut = pcmBuf[pcm];
 
@@ -60,10 +61,10 @@ int dxpSoundThreadFunc_file(SceSize size,void* argp)
 			if ( dxpSoundCodecDecode(pHnd) < 0 ) {
 				if ( pHnd->file.loop ) {
 					dxpSoundCodecSeek(pHnd, pHnd->loopResumePos);
-					continue;
+				} else {
+					dxpSoundCodecSeek(pHnd, 0);
+					pHnd->playing = 0;
 				}
-				dxpSoundCodecSeek(pHnd,0);
-				pHnd->playing = 0;
 				continue;
 			}
 
@@ -71,12 +72,11 @@ int dxpSoundThreadFunc_file(SceSize size,void* argp)
 			sceAudioSetChannelDataLen(channel, PSP_AUDIO_SAMPLE_ALIGN(pHnd->avContext.outSampleNum));
 			sceAudioOutputPanned(
 				channel,
-				PSP_AUDIO_VOLUME_MAX * (pHnd->pan > 0 ? 1.0f - pHnd->pan / 10000.0f : 1.0f) * pHnd->volume / 255.0f,
-				PSP_AUDIO_VOLUME_MAX * (pHnd->pan < 0 ? 1.0f + pHnd->pan / 10000.0f : 1.0f) * pHnd->volume / 255.0f,
+				PSP_AUDIO_VOLUME_MAX * (pHnd->pan > 0 ? 1.0f - pHnd->pan * 0.0001f : 1.0f) * pHnd->volume / 255.0f,
+				PSP_AUDIO_VOLUME_MAX * (pHnd->pan < 0 ? 1.0f + pHnd->pan * 0.0001f : 1.0f) * pHnd->volume / 255.0f,
 				pcmBuf[pcm]
 			);
-		}else
-		{
+		} else {
 			if(channel >= 0)
 			{
 				sceAudioChRelease(channel);
@@ -97,14 +97,15 @@ int dxpSoundThreadFunc_file(SceSize size,void* argp)
 int memnopress_handle[PSP_AUDIO_CHANNEL_MAX];
 int memnopress_pos[PSP_AUDIO_CHANNEL_MAX];
 int memnopress_playtype[PSP_AUDIO_CHANNEL_MAX];
-int memnopress_channel[PSP_AUDIO_CHANNEL_MAX];
 
-int dxpSoundThreadFunc_memnopress(SceSize len,void* ptr)
+int dxpSoundThreadFunc_memnopress(SceSize size, void* argp)
 {
+	int channel[PSP_AUDIO_CHANNEL_MAX];
 	int i,j;
+
 	for(i = 0;i < PSP_AUDIO_CHANNEL_MAX;++i) {
 		memnopress_handle[i] = -1;
-		memnopress_channel[i] = -1;
+		channel[i] = -1;
 	}
 
 	while(dxpSoundData.init)
@@ -125,11 +126,12 @@ int dxpSoundThreadFunc_memnopress(SceSize len,void* ptr)
 			case DXP_SOUNDCMD_PLAY:
 				for( j = 0; j < PSP_AUDIO_CHANNEL_MAX; j++ ) {
 					if( memnopress_handle[j] < 0 ) {
-						memnopress_channel[j] = dxpSoundAudioChReserve(&dxpSoundArray[i].avContext);
-						if ( memnopress_channel[j] < 0 ) break;
+						channel[j] = dxpSoundAudioChReserve(&dxpSoundArray[i].avContext);
+						if ( channel[j] < 0 ) break;
 						memnopress_handle[j] = i;
 						memnopress_pos[j] = 0;
 						memnopress_playtype[j] = dxpSoundArray[i].memnopress.cmdplaytype;
+						++dxpSoundArray[i].playing;
 						break;
 					}
 				}
@@ -140,50 +142,46 @@ int dxpSoundThreadFunc_memnopress(SceSize len,void* ptr)
 			default:
 				for(j = 0;j < PSP_AUDIO_CHANNEL_MAX;++j) {
 					if(memnopress_handle[j] == i) {
-						if(memnopress_channel[j] >= 0)sceAudioChRelease(memnopress_channel[j]);
-						memnopress_channel[j] = -1;
+						if(channel[j] >= 0)sceAudioChRelease(channel[j]);
+						channel[j] = -1;
 						--dxpSoundArray[memnopress_handle[j]].playing;
 						memnopress_handle[j] = -1;
 					}
 				}
 				dxpSoundArray[i].cmd = DXP_SOUNDCMD_NONE;
-				break;			
+				break;
 			}
 		}
 
 		//ループ等制御
 		for( i = 0; i < PSP_AUDIO_CHANNEL_MAX; ++i) {
 			if( memnopress_handle[i] < 0 ) continue;
-
+			if( sceAudioGetChannelRestLen(channel[i]) > 0 ) continue;
 			if ( memnopress_pos[i] >= dxpSoundArray[memnopress_handle[i]].memnopress.length ) {
 				if ( memnopress_playtype[i] == DX_PLAYTYPE_LOOP ) {
 					memnopress_pos[i] = dxpSoundArray[memnopress_handle[i]].loopResumePos;
 				} else {
-					if ( memnopress_channel[i] >= 0 ) sceAudioChRelease(memnopress_channel[i]);
-					memnopress_channel[i] = -1;
+					if ( channel[i] >= 0 ) sceAudioChRelease(channel[i]);
+					channel[i] = -1;
 					memnopress_handle[i] = -1;
 					--dxpSoundArray[memnopress_handle[i]].playing;
 					continue;
 				}
 			}
 
-		//再生バッファ監視
-		//再生
-			if ( sceAudioGetChannelRestLen(memnopress_channel[i]) <= 0 ) {
-				//sceAudioSetChannelDataLen(channel, PSP_AUDIO_SAMPLE_ALIGN(dxpSoundArray[memnopress_handle[i]].avContext.outSampleNum));
-				sceAudioOutputPanned(
-					memnopress_channel[i],
-					PSP_AUDIO_VOLUME_MAX * (dxpSoundArray[memnopress_handle[i]].pan > 0 ? 1.0f - dxpSoundArray[memnopress_handle[i]].pan / 10000.0f : 1.0f) * dxpSoundArray[memnopress_handle[i]].volume / 255.0f,
-					PSP_AUDIO_VOLUME_MAX * (dxpSoundArray[memnopress_handle[i]].pan < 0 ? 1.0f + dxpSoundArray[memnopress_handle[i]].pan / 10000.0f : 1.0f) * dxpSoundArray[memnopress_handle[i]].volume / 255.0f,
-					dxpSoundArray[memnopress_handle[i]].memnopress.pcmBuf + memnopress_pos[i]
-				);
-				//memnopress_pos[i] += dxpSoundGetNextSampleNum(&dxpSoundArray[memnopress_handle[i]].avContext);
-				memnopress_pos[i] += dxpSoundArray[memnopress_handle[i]].avContext.outSampleNum;
-			}
+			//再生
+			//sceAudioSetChannelDataLen(channel, PSP_AUDIO_SAMPLE_ALIGN(dxpSoundArray[memnopress_handle[i]].avContext.outSampleNum));
+			sceAudioOutputPanned(
+				channel[i],
+				PSP_AUDIO_VOLUME_MAX * (dxpSoundArray[memnopress_handle[i]].pan > 0 ? 1.0f - dxpSoundArray[memnopress_handle[i]].pan * 0.0001f : 1.0f) * dxpSoundArray[memnopress_handle[i]].volume / 255.0f,
+				PSP_AUDIO_VOLUME_MAX * (dxpSoundArray[memnopress_handle[i]].pan < 0 ? 1.0f + dxpSoundArray[memnopress_handle[i]].pan * 0.0001f : 1.0f) * dxpSoundArray[memnopress_handle[i]].volume / 255.0f,
+				dxpSoundArray[memnopress_handle[i]].memnopress.pcmBuf + dxpSoundCalcBufferSize(&dxpSoundArray[memnopress_handle[i]].avContext, memnopress_pos[i])
+			);
+			memnopress_pos[i] += dxpSoundArray[memnopress_handle[i]].avContext.outSampleNum;
 		}
 	}
 	for(i = 0;i < PSP_AUDIO_CHANNEL_MAX;++i) {
-		if(memnopress_channel[i] >= 0)sceAudioChRelease(memnopress_channel[i]);
+		if(channel[i] >= 0)sceAudioChRelease(channel[i]);
 		if(memnopress_handle[i] >= 0) {
 			dxpSoundArray[memnopress_handle[i]].playing = 0;
 		}
