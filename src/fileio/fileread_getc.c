@@ -8,7 +8,6 @@ int FileRead_getc(int filehandle)
 	FHANDLE2PTR(pHnd,filehandle);
 	if(pHnd->onmemory)
 	{
-		int ret;
 		if(pHnd->pos >= pHnd->size)
 			pHnd->pos = pHnd->size;
 		else
