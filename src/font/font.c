@@ -6,7 +6,7 @@
 #include <string.h>
 static int gustatus;
 
-DXPFONTDATA dxpFontData = { .init = 0 };
+DXPFONTDATA dxpFontData;
 DXPFONTHANDLE dxpFontArray[DXP_BUILDOPTION_FONTHANDLE_MAX];
 
 void dxpFontInit()
