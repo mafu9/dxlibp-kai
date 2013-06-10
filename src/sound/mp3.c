@@ -58,7 +58,7 @@ int dxpSoundGetID3v2Size(int fh)
 
 int dxpSoundMp3CheckFrameHeader(u8 *buf)
 {
-	u32 header,version;
+	u32 header, version, channel;
 	const int bitrates[2][15]
 	= {
 		{0,	32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320 },	//MPEG1
@@ -73,6 +73,9 @@ int dxpSoundMp3CheckFrameHeader(u8 *buf)
 	header = (header << 8) | buf[2];
 	header = (header << 8) | buf[3];
 	if((header & 0xFFE00000) != 0xFFE00000)return -1;
+
+	channel = (header & 0xC0) >> 6;
+	if(channel != 2)return -1; //MediaEngine doesn't support mono sound
 
 	version = (header & 0x180000) >> 19;
 	switch(version)
@@ -193,7 +196,7 @@ int dxpSoundMp3Decode(DXPAVCONTEXT *av)
 	av->mp3.avBuf->datIn = av->mp3.mp3Buf;
 	av->mp3.avBuf->decodeByte = samplecount * 2 * 2;
 	av->mp3.avBuf->frameSize0 = av->mp3.avBuf->frameSize1 = frameLen;
-	av->mp3.avBuf->pcmOut = av->pcmOut;
+	av->mp3.avBuf->pcmOut = (u32*)av->pcmOut;
 	if ( sceAudiocodecDecode((unsigned long*)av->mp3.avBuf, PSP_CODEC_MP3) < 0 ) return -1;
 	av->nextPos += samplecount;
 	return 0;

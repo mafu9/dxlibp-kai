@@ -97,7 +97,7 @@ typedef struct DXPAVCONTEXT {
 	//Uファイルサイズ
 	int fileSize;
 	//U出力先
-	u32 *pcmOut;
+	u8 *pcmOut;
 	
 	//D1サンプルのサイズ
 	u8 sampleSize;
@@ -147,7 +147,7 @@ typedef struct DXPSOUNDHANDLE
 		//DX_SOUNDDATATYPE_MEMNOPRESSで使用
 		struct {
 			int length;
-			u32 *pcmBuf;
+			u8 *pcmBuf;
 			int cmdplaytype;
 		} memnopress;
 	};

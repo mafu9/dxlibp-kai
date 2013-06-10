@@ -147,7 +147,7 @@ int LoadSoundMem(const char *filename)
 		pHnd->memnopress.length = pHnd->avContext.totalSampleNum;
 		int bufsize = dxpSoundCalcBufferSize(&pHnd->avContext, pHnd->memnopress.length);
 		bufsize = ((bufsize / pHnd->avContext.outSampleNum) + 1) * pHnd->avContext.outSampleNum;
-		pHnd->memnopress.pcmBuf = (u32*)memalign(64, bufsize);
+		pHnd->memnopress.pcmBuf = (u8*)memalign(64, bufsize);
 		if ( !pHnd->memnopress.pcmBuf ) {
 			free(pHnd->memnopress.pcmBuf);
 			dxpSoundCodecEnd(pHnd);
@@ -163,7 +163,7 @@ int LoadSoundMem(const char *filename)
 		} else {
 			for ( ; ; ) {
 				if ( pHnd->avContext.nextPos >= pHnd->memnopress.length ) break;
-				pHnd->avContext.pcmOut = pHnd->memnopress.pcmBuf + pHnd->avContext.nextPos;
+				pHnd->avContext.pcmOut = pHnd->memnopress.pcmBuf + dxpSoundCalcBufferSize(&pHnd->avContext, pHnd->avContext.nextPos);
 				if ( dxpSoundCodecDecode(pHnd) < 0 ) break;
 			}
 		}
@@ -220,9 +220,9 @@ int PlaySoundMem(int handle,int playtype,int rewindflag)
 			while ( pos < pHnd->memnopress.length ) {
 				sceAudioOutputPannedBlocking(
 					channel,
-					PSP_AUDIO_VOLUME_MAX * (pHnd->pan > 0 ? 1.0f - pHnd->pan * 0.0001f: 1.0f) * pHnd->volume / 255.0f,
+					PSP_AUDIO_VOLUME_MAX * (pHnd->pan > 0 ? 1.0f - pHnd->pan * 0.0001f : 1.0f) * pHnd->volume / 255.0f,
 					PSP_AUDIO_VOLUME_MAX * (pHnd->pan < 0 ? 1.0f + pHnd->pan * 0.0001f : 1.0f) * pHnd->volume / 255.0f,
-					pHnd->memnopress.pcmBuf + pos
+					pHnd->memnopress.pcmBuf + dxpSoundCalcBufferSize(&pHnd->avContext, pos)
 				);
 				pos += pHnd->avContext.outSampleNum;
 			}

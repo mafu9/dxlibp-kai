@@ -7,7 +7,7 @@
 int dxpSoundThreadFunc_file(SceSize size, void* argp)
 {
 	int channel = -1;
-	u32 *pcmBuf[2] = {NULL,NULL};
+	u8 *pcmBuf[2] = {NULL,NULL};
 	u32 pcmBufSize[2] = {0,0};
 	u8 pcm = 1;
 	DXPSOUNDHANDLE *pHnd = dxpSoundArray + *(int*)argp;
@@ -38,15 +38,16 @@ int dxpSoundThreadFunc_file(SceSize size, void* argp)
 			if ( channel < 0 ) continue;
 			
 			//バッファの確保
-			if ( pcmBufSize[pcm] < dxpSoundCalcBufferSize(&pHnd->avContext, pHnd->avContext.outSampleNum) ) {
+			if ( pcmBufSize[pcm] < PSP_AUDIO_SAMPLE_ALIGN(dxpSoundCalcBufferSize(&pHnd->avContext, pHnd->avContext.outSampleNum)) ) {
 				free(pcmBuf[pcm]);
-				pcmBufSize[pcm] = dxpSoundCalcBufferSize(&pHnd->avContext, pHnd->avContext.outSampleNum);
-				pcmBuf[pcm] = (u32*)memalign(64, pcmBufSize[pcm]);
+				pcmBufSize[pcm] = PSP_AUDIO_SAMPLE_ALIGN(dxpSoundCalcBufferSize(&pHnd->avContext, pHnd->avContext.outSampleNum));
+				pcmBuf[pcm] = (u8*)memalign(64, pcmBufSize[pcm]);
 				if ( !pcmBuf[pcm] ) {
 					pcmBufSize[pcm] = 0;
 					pHnd->playing = 0;
 					continue;
 				}
+				memset(pcmBuf[pcm], 0, pcmBufSize[pcm]); 
 			}
 			pHnd->avContext.pcmOut = pcmBuf[pcm];
 
@@ -75,8 +76,7 @@ int dxpSoundThreadFunc_file(SceSize size, void* argp)
 				PSP_AUDIO_VOLUME_MAX * (pHnd->pan < 0 ? 1.0f + pHnd->pan * 0.0001f : 1.0f) * pHnd->volume / 255.0f,
 				pcmBuf[pcm]
 			);
-		}else
-		{
+		} else {
 			if(channel >= 0)
 			{
 				sceAudioChRelease(channel);
@@ -148,7 +148,7 @@ int dxpSoundThreadFunc_memnopress(SceSize size, void* argp)
 					}
 				}
 				dxpSoundArray[i].cmd = DXP_SOUNDCMD_NONE;
-				break;			
+				break;
 			}
 		}
 
@@ -177,7 +177,7 @@ int dxpSoundThreadFunc_memnopress(SceSize size, void* argp)
 				memnopress_channel[i],
 				PSP_AUDIO_VOLUME_MAX * (dxpSoundArray[memnopress_handle[i]].pan > 0 ? 1.0f - dxpSoundArray[memnopress_handle[i]].pan * 0.0001f : 1.0f) * dxpSoundArray[memnopress_handle[i]].volume / 255.0f,
 				PSP_AUDIO_VOLUME_MAX * (dxpSoundArray[memnopress_handle[i]].pan < 0 ? 1.0f + dxpSoundArray[memnopress_handle[i]].pan * 0.0001f : 1.0f) * dxpSoundArray[memnopress_handle[i]].volume / 255.0f,
-				dxpSoundArray[memnopress_handle[i]].memnopress.pcmBuf + memnopress_pos[i]
+				dxpSoundArray[memnopress_handle[i]].memnopress.pcmBuf + dxpSoundCalcBufferSize(&dxpSoundArray[memnopress_handle[i]].avContext, memnopress_pos[i])
 			);
 			memnopress_pos[i] += dxpSoundArray[memnopress_handle[i]].avContext.outSampleNum;
 		}
