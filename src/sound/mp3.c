@@ -115,7 +115,7 @@ int dxpSoundMp3Init(DXPAVCONTEXT *av)
 	av->sampleRate = dxpSoundMp3GetSampleRate(buf);
 
 	FileRead_seek(av->fileHandle,av->mp3.id3v2Pos,SEEK_SET);
-	av->mp3.avBuf = memalign(64, sizeof(DXPAVCODEC_BUFFER));
+	av->mp3.avBuf = (DXPAVCODEC_BUFFER*)memalign(64, sizeof(DXPAVCODEC_BUFFER));
 	if(!av->mp3.avBuf)return -1;
 	memset(av->mp3.avBuf,0,sizeof(DXPAVCODEC_BUFFER));
 	status = sceAudiocodecCheckNeedMem((unsigned long*)av->mp3.avBuf,PSP_CODEC_MP3);

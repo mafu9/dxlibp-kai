@@ -167,7 +167,6 @@ extern DXPSOUNDDATA dxpSoundData;
 extern int memnopress_handle[PSP_AUDIO_CHANNEL_MAX];
 extern int memnopress_pos[PSP_AUDIO_CHANNEL_MAX];
 extern int memnopress_playtype[PSP_AUDIO_CHANNEL_MAX];
-extern int memnopress_channel[PSP_AUDIO_CHANNEL_MAX];
 
 int dxpSoundInit();
 int dxpSoundTerm();

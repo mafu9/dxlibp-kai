@@ -33,7 +33,7 @@ int dxpSoundInit()
 	int ret;
 	ret = sceUtilityLoadAvModule(PSP_AV_MODULE_AVCODEC);
 	if(ret < 0)return -1;
-	memset(&dxpSoundArray,0,sizeof(dxpSoundArray));
+	memset(dxpSoundArray,0,sizeof(dxpSoundArray));
 	dxpSoundData.init = 1;
 	sceKernelStartThread(sceKernelCreateThread("dxp mnp sound thread",dxpSoundThreadFunc_memnopress,0x11,0x4000,PSP_THREAD_ATTR_USER,0),0,0);
 	return 0;
@@ -144,7 +144,7 @@ int LoadSoundMem(const char *filename)
 
 	switch(pHnd->soundDataType) {
 	case DX_SOUNDDATATYPE_MEMNOPRESS:
-		pHnd->memnopress.length = dxpSoundCodecGetSampleLength(pHnd);
+		pHnd->memnopress.length = pHnd->avContext.totalSampleNum;
 		int bufsize = dxpSoundCalcBufferSize(&pHnd->avContext, pHnd->memnopress.length);
 		bufsize = ((bufsize / pHnd->avContext.outSampleNum) + 1) * pHnd->avContext.outSampleNum;
 		pHnd->memnopress.pcmBuf = (u32*)memalign(64, bufsize);
@@ -182,7 +182,7 @@ int LoadSoundMem(const char *filename)
 			return -1;
 		}
 
-		int stat = sceKernelStartThread(pHnd->file.threadId, 4, &handle);
+		int stat = sceKernelStartThread(pHnd->file.threadId, sizeof(handle), &handle);
 		if ( stat < 0 ) {
 			sceKernelDeleteThread(pHnd->file.threadId);
 			dxpSoundCodecEnd(pHnd);
@@ -220,8 +220,8 @@ int PlaySoundMem(int handle,int playtype,int rewindflag)
 			while ( pos < pHnd->memnopress.length ) {
 				sceAudioOutputPannedBlocking(
 					channel,
-					PSP_AUDIO_VOLUME_MAX * (pHnd->pan > 0 ? 1.0f - pHnd->pan / 10000.0f : 1.0f) * pHnd->volume / 255.0f,
-					PSP_AUDIO_VOLUME_MAX * (pHnd->pan < 0 ? 1.0f + pHnd->pan / 10000.0f : 1.0f) * pHnd->volume / 255.0f,
+					PSP_AUDIO_VOLUME_MAX * (pHnd->pan > 0 ? 1.0f - pHnd->pan * 0.0001f: 1.0f) * pHnd->volume / 255.0f,
+					PSP_AUDIO_VOLUME_MAX * (pHnd->pan < 0 ? 1.0f + pHnd->pan * 0.0001f : 1.0f) * pHnd->volume / 255.0f,
 					pHnd->memnopress.pcmBuf + pos
 				);
 				pos += pHnd->avContext.outSampleNum;
@@ -243,7 +243,7 @@ int PlaySoundMem(int handle,int playtype,int rewindflag)
 		if(playtype == DX_PLAYTYPE_NORMAL)
 		{
 			while(pHnd->cmd != DXP_SOUNDCMD_NONE)sceKernelDelayThread(100);
-			while(pHnd->playing)sceKernelDelayThread(100);
+			while(pHnd->playing > 0)sceKernelDelayThread(100);
 		}
 		break;
 	default:
