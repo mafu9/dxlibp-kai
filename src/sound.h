@@ -52,7 +52,6 @@ typedef struct _DXPAVCONTEXT_MP3 {
 	DXPAVCODEC_BUFFER *avBuf;
 	int id3v1Pos;
 	int id3v2Pos;
-	u32 blockId;//メモリ確保に使う。
 	u8 *mp3Buf;
 	u32 mp3BufSize;
 } DXPAVCONTEXT_MP3 ;
