@@ -70,20 +70,16 @@ int dxpSoundReserveHandle()
 
 int dxpSoundReleaseHandle(int handle)
 {
-	if(!dxpSoundData.init)return -1;
 	DXPSOUNDHANDLE *pHnd;
-	if(handle < 0 || handle >= DXP_BUILDOPTION_SOUNDHANDLE_MAX)return -1;
-	pHnd = dxpSoundArray + handle;
+	SHND2PTR(handle, pHnd);
 	pHnd->used = 0;
 	return 0;
 }
 
 int GetSoundInfo(int handle, DXP_SOUND_DATA *dest)
 {
-	if(!dxpSoundData.init)return -1;
 	DXPSOUNDHANDLE *pHnd;
-	if(handle < 0 || handle >= DXP_BUILDOPTION_SOUNDHANDLE_MAX)return -1;
-	pHnd = dxpSoundArray + handle;
+	SHND2PTR(handle, pHnd);
 	dest->data = (void *)pHnd->memnopress.pcmBuf;
 	dest->sample_len = pHnd->avContext.totalSampleNum;
 	dest->sample_rate = pHnd->avContext.sampleRate;
@@ -368,17 +364,15 @@ int SetLoopSamplePosSoundMem(int looppos,int handle)
 
 int GetSoundPlayTime(int handle)
 {
-	if ( !dxpSoundData.init ) return -1;
-	if ( handle < 0 || handle >= DXP_BUILDOPTION_SOUNDHANDLE_MAX ) return -1;
-	DXPSOUNDHANDLE *pHnd = dxpSoundArray + handle;
+	DXPSOUNDHANDLE *pHnd;
+	SHND2PTR(handle,pHnd);
 	return pHnd->avContext.totalSampleNum / pHnd->avContext.sampleRate;
 }
 
 int GetSoundPlayedTime(int handle)
 {
-	if ( !dxpSoundData.init ) return -1;
-	if ( handle < 0 || handle >= DXP_BUILDOPTION_SOUNDHANDLE_MAX ) return -1;
-	DXPSOUNDHANDLE *pHnd = dxpSoundArray + handle;
+	DXPSOUNDHANDLE *pHnd;
+	SHND2PTR(handle,pHnd);
 	switch(pHnd->soundDataType)
 	{
 	case DX_SOUNDDATATYPE_MEMNOPRESS:
