@@ -14,7 +14,11 @@ http://www.psp-programming.com/benhur
 #include "../cpcnv.h"
 #include "liblzr.h"
 
-DXPCPDATA dxpCpData = {0,0};
+DXPCPDATA dxpCpData =
+{
+	.init = 0,
+	.errcode_ucs2 = 0,
+};
 
 int dxpCpSetTable(void* ptr,u32 bytesize,u8 cp,u8 direction) {
 	DXPCPTABLE *table;
