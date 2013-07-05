@@ -164,9 +164,9 @@ int dxpSoundThreadFunc_memnopress(SceSize size, void* argp)
 					memnopress_pos[i] = dxpSoundArray[memnopress_handle[i]].loopResumePos;
 				} else {
 					if ( memnopress_channel[i] >= 0 ) sceAudioChRelease(memnopress_channel[i]);
+					--dxpSoundArray[memnopress_handle[i]].playing;
 					memnopress_channel[i] = -1;
 					memnopress_handle[i] = -1;
-					--dxpSoundArray[memnopress_handle[i]].playing;
 					continue;
 				}
 			}
@@ -184,9 +184,9 @@ int dxpSoundThreadFunc_memnopress(SceSize size, void* argp)
 	}
 	for(i = 0;i < PSP_AUDIO_CHANNEL_MAX;++i) {
 		if(memnopress_channel[i] >= 0)sceAudioChRelease(memnopress_channel[i]);
-		if(memnopress_handle[i] >= 0) {
-			dxpSoundArray[memnopress_handle[i]].playing = 0;
-		}
+		if(memnopress_handle[i] >= 0)dxpSoundArray[memnopress_handle[i]].playing = 0;
+		memnopress_channel[i] = -1;
+		memnopress_handle[i] = -1;
 	}
 	sceKernelExitDeleteThread(0);
 	return 0;

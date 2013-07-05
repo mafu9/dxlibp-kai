@@ -23,7 +23,7 @@ int dxpSoundGetID3v1Size(int fh)
 	if(fh < 0)return -1;
 	pos = FileRead_tell(fh);
 	FileRead_seek(fh,128,SEEK_END);
-	FileRead_read(buf,3,fh);
+	if(FileRead_read(buf,3,fh) != 3)return -1;
 	if(!strncmp(buf,"TAG",3))ret = 128;
 	FileRead_seek(fh,pos,SEEK_SET);
 	return ret;
@@ -36,7 +36,7 @@ int dxpSoundGetID3v2Size(int fh)
 	if(fh < 0)return -1;
 	pos = FileRead_tell(fh);
 	FileRead_seek(fh,0,SEEK_SET);
-	FileRead_read(header,10,fh);
+	if(FileRead_read(header,10,fh) != 10)return -1;
 	if(!strncmp(header,"ID3",3) || !strncmp(header,"ea3",3))
 	{
 		u32 tagsize;
@@ -157,7 +157,7 @@ int dxpSoundMp3Seek(DXPAVCONTEXT *av,int sample)
 	FileRead_seek(av->fileHandle,av->mp3.id3v2Pos,SEEK_SET);
 	for(i = 0;i < frame;++i)
 	{
-		FileRead_read(buf,4,av->fileHandle);
+		if(FileRead_read(buf,4,av->fileHandle) != 4)return -1;
 		frameLen = dxpSoundMp3CheckFrameHeader(buf);
 		if(frameLen == -1)return -1;
 		FileRead_seek(av->fileHandle,frameLen - 4,SEEK_CUR);
@@ -173,14 +173,14 @@ int dxpSoundMp3Decode(DXPAVCONTEXT *av)
 
 	if ( av->format != DXP_SOUNDFMT_MP3 ) return -1;
 
-	FileRead_read(headerBuf, 4, av->fileHandle);
+	if ( FileRead_read(headerBuf, 4, av->fileHandle) != 4 ) return -1;
 	if ( headerBuf[0] == 'T' && headerBuf[1] == 'A' && headerBuf[2] == 'G' ) return -1;
 
 	frameLen = dxpSoundMp3CheckFrameHeader(headerBuf);
 	if ( frameLen < 0 ) return -1;
 	if ( av->mp3.mp3BufSize < frameLen ) {
 		free(av->mp3.mp3Buf);
-		av->mp3.mp3Buf = memalign(64, frameLen);
+		av->mp3.mp3Buf = (u8*)memalign(64, frameLen);
 		if ( !av->mp3.mp3Buf ) {
 			av->mp3.mp3BufSize = 0;
 			return -1;

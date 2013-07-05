@@ -119,7 +119,7 @@ int LoadSoundMem(const char *filename)
 		FileRead_read(pHnd->file.buffer, fileSize, fileHandle);
 		FileRead_close(fileHandle);
 		fileHandle = dxpFileioOpenOnMemory(pHnd->file.buffer, fileSize);
-		if(fileHandle <= 0)
+		if(fileHandle == 0)
 		{
 			free(pHnd->file.buffer);
 			dxpSoundReleaseHandle(handle);
@@ -145,7 +145,6 @@ int LoadSoundMem(const char *filename)
 		bufsize = ((bufsize / pHnd->avContext.outSampleNum) + 1) * pHnd->avContext.outSampleNum;
 		pHnd->memnopress.pcmBuf = (u8*)memalign(64, bufsize);
 		if ( !pHnd->memnopress.pcmBuf ) {
-			free(pHnd->memnopress.pcmBuf);
 			dxpSoundCodecEnd(pHnd);
 			FileRead_close(fileHandle);
 			dxpSoundReleaseHandle(handle);
@@ -157,8 +156,7 @@ int LoadSoundMem(const char *filename)
 			pHnd->avContext.pcmOut = pHnd->memnopress.pcmBuf;
 			dxpSoundWavAllDecode(&pHnd->avContext);
 		} else {
-			for ( ; ; ) {
-				if ( pHnd->avContext.nextPos >= pHnd->memnopress.length ) break;
+			for ( ; pHnd->avContext.nextPos < pHnd->memnopress.length; ) {
 				pHnd->avContext.pcmOut = pHnd->memnopress.pcmBuf + dxpSoundCalcBufferSize(&pHnd->avContext, pHnd->avContext.nextPos);
 				if ( dxpSoundCodecDecode(pHnd) < 0 ) break;
 			}
@@ -223,11 +221,13 @@ int PlaySoundMem(int handle,int playtype,int rewindflag)
 				pos += pHnd->avContext.outSampleNum;
 			}
 			sceAudioChRelease(channel);
-			return 0;
 		}
-		while(pHnd->cmd != DXP_SOUNDCMD_NONE)sceKernelDelayThread(100);
-		pHnd->memnopress.cmdplaytype = playtype;
-		pHnd->cmd = DXP_SOUNDCMD_PLAY;
+		else
+		{
+			while(pHnd->cmd != DXP_SOUNDCMD_NONE)sceKernelDelayThread(100);
+			pHnd->memnopress.cmdplaytype = playtype;
+			pHnd->cmd = DXP_SOUNDCMD_PLAY;
+		}
 		break;
 
 	case DX_SOUNDDATATYPE_MEMPRESS:
@@ -269,7 +269,7 @@ int DeleteSoundMem(int handle)
 		while(pHnd->playing > 0)sceKernelDelayThread(100);
 		free(pHnd->memnopress.pcmBuf);
 		dxpSoundReleaseHandle(handle);
-		return 0;
+		break;
 	case DX_SOUNDDATATYPE_MEMPRESS:
 	case DX_SOUNDDATATYPE_FILE:
 		while(pHnd->playing > 0)sceKernelDelayThread(100);
@@ -277,10 +277,11 @@ int DeleteSoundMem(int handle)
 		FileRead_close(pHnd->avContext.fileHandle);
 		if(pHnd->soundDataType == DX_SOUNDDATATYPE_MEMPRESS)free(pHnd->file.buffer);
 		dxpSoundReleaseHandle(handle);
-		return 0;
+		break;
 	default:
 		return -1;
 	}
+	return 0;
 }
 
 int CheckSoundMem(int handle)
