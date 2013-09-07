@@ -105,7 +105,7 @@ int LZRDecompress(void *out, unsigned int out_capacity, void *in, void *in_end) 
 			/* single new char */
 
 			if (buf_off > 0) buf_off--;
-			if (next_out == out_end) return -1;
+			if (next_out == out_end) { free(buf); return -1; }
 			buf_ptr1 = buf + (((((((int)(next_out - (unsigned char*)out)) & 0x07) << 8) + last_char) >> type) & 0x07) * 0xFF - 0x01;
 			for (j = 1; j <= 0xFF; ) {
 				LZRNextBit(buf_ptr1+j, &j, &mask, &mask, &buffer, next_in);
@@ -131,7 +131,7 @@ int LZRDecompress(void *out, unsigned int out_capacity, void *in, void *in_end) 
 			if ((flag != 0) || (n_bits >= 0)) {
 				buf_ptr1 = buf + (n_bits << 5) + (((((int)(next_out - (unsigned char*)out)) << n_bits) & 0x03) << 3) + buf_off + 2552;
 				seq_len = LZRGetNumber(n_bits, buf_ptr1, 8, &flag, &mask, &buffer, next_in);
-				if (seq_len == 0xFF) return next_out - (unsigned char*)out; //end of data stream
+				if (seq_len == 0xFF) { free(buf); return next_out - (unsigned char*)out; } //end of data stream
 				if ((flag != 0) || (n_bits > 0)) {
 					buf_ptr2 += 56;
 					j = 352;
@@ -157,9 +157,9 @@ int LZRDecompress(void *out, unsigned int out_capacity, void *in, void *in_end) 
 
 			/* copy sequence */
 			next_seq = next_out - seq_off;
-			if (next_seq < (unsigned char*)out) return -1;
+			if (next_seq < (unsigned char*)out) { free(buf); return -1; }
 			seq_end = next_out + seq_len + 1;
-			if (seq_end > out_end) return -1;
+			if (seq_end > out_end) { free(buf); return -1; }
 			buf_off = ((((int)(seq_end - (unsigned char*)out))+1) & 0x01) + 0x06;
 			do {
 				*next_out++ = *next_seq++;
