@@ -29,18 +29,27 @@ int MakeGraphFromScreen(void)
 }
 
 static DXPTEXTURE3* LoadScreen(void)
-{	
+{
 	DXPTEXTURE3 *texptr = NULL;
 
-	int x, y, bufferwidth, pixelformat;
-	u32* vram32 = NULL;
-	u16* vram16 = NULL;
-	u32* src32 = NULL;
-	u16* src16 = NULL;
+	int y, bufferwidth, pixelformat, pixelsize;
+	u8* vram = NULL;
 
 	//display information
-	sceDisplayGetFrameBuf((void*)&vram32, &bufferwidth, &pixelformat, 0);
-	vram16 = (u16*)vram32;
+	sceDisplayGetFrameBuf((void**)&vram, &bufferwidth, &pixelformat, 0);
+
+	switch ( pixelformat ) {
+	case PSP_DISPLAY_PIXEL_FORMAT_8888:
+		pixelsize = 4;
+		break;
+	case PSP_DISPLAY_PIXEL_FORMAT_565:
+	case PSP_DISPLAY_PIXEL_FORMAT_5551:
+	case PSP_DISPLAY_PIXEL_FORMAT_4444:
+		pixelsize = 2;
+		break;
+	default:
+		return NULL;
+	}
 
 	//image information
 	int width  = SCREEN_WIDTH;
@@ -48,37 +57,14 @@ static DXPTEXTURE3* LoadScreen(void)
 	int pitch = ((width + 3) >> 2) << 2;
 	int texwidth = AlignPow2(width);
 	int texheight = AlignPow2(height);
-	int bufsize = pitch * texheight * (pixelformat == PSP_DISPLAY_PIXEL_FORMAT_8888 ? 4 : 2);	
-	void *data = malloc(bufsize);
+	u8 *data = (u8*)malloc(pitch * texheight * pixelsize);
 	if ( data == NULL ) {
 		dxpGraphicsReleseTexture(texptr);
 		return NULL;
 	}
 
-	src32 = (u32*)data;
-	src16 = (u16*)data;
-
-	for ( y = 0; y < SCREEN_HEIGHT; y++ ) {
-		for ( x = 0; x < SCREEN_WIDTH; x++ ) {
-			switch ( pixelformat ) {
-
-			case PSP_DISPLAY_PIXEL_FORMAT_8888:
-				src32[x + y * pitch] = vram32[x + y * bufferwidth];
-				break;
-
-			case PSP_DISPLAY_PIXEL_FORMAT_565:
-			case PSP_DISPLAY_PIXEL_FORMAT_5551:
-			case PSP_DISPLAY_PIXEL_FORMAT_4444:
-				src16[x + y * pitch] = vram16[x + y * bufferwidth];
-				break;
-
-			default:
-				free(data);
-				dxpGraphicsReleseTexture(texptr);
-				return NULL;
-			}
-		}
-	}
+	for ( y = 0; y < SCREEN_HEIGHT; y++ )
+		memcpy(data + y * pitch * pixelsize, vram + y * bufferwidth * pixelsize, SCREEN_WIDTH * pixelsize);
 
 	texptr = dxpGraphicsCreateTexture();
 	if ( !texptr ) {
