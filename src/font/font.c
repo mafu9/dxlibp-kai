@@ -247,7 +247,7 @@ int	DrawFormatStringToHandle(int x,int y,int color,int handle,const char *format
 	va_start(arg,format);
 	vsnprintf(str,1024,format,arg);
 	va_end(arg);
-	strbuf[1023] = '\0';
+	str[1023] = '\0';
 	return DrawStringToHandle(x,y,str,color,handle,0);
 }
 
