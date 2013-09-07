@@ -75,6 +75,7 @@ int dxpFileioInit(void)
 	for(i = 0; i < sizeof(dxpFileioData.eventFlags) / sizeof(dxpFileioData.eventFlags[0]); ++i)
 	{
 		snprintf(name, 32, "dxp file event flag %d", i);
+		name[31] = '\0';
 		dxpFileioData.eventFlags[i] = sceKernelCreateEventFlag(name, 0, 0xFFFFFFFF, NULL);
 		if(dxpFileioData.eventFlags[i] < 0)return -1;
 	}

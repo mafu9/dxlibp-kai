@@ -43,9 +43,10 @@ float GetDrawFormatStringWidthToHandleF(int handle,const char *format, ... )
 	int len;
 	va_list arg;
 	va_start(arg,format);
-	vsnprintf(str,1024,format,arg);
+	len = vsnprintf(str,1024,format,arg);
+	if (len < 0) len = 1023;
 	va_end(arg);
-	len = strlen(str);
+	str[1023] = '\0';
 	return GetDrawStringWidthToHandleF(str,len,handle);
 	
 }
@@ -56,9 +57,10 @@ int GetDrawFormatStringWidthToHandle(int handle,const char *format, ... )
 	int len;
 	va_list arg;
 	va_start(arg,format);
-	vsnprintf(str,1024,format,arg);
+	len = vsnprintf(str,1024,format,arg);
+	if (len < 0) len = 1023;
 	va_end(arg);
-	len = strlen(str);
+	str[1023] = '\0';
 	return GetDrawStringWidthToHandle(str,len,handle);
 }
 
@@ -68,9 +70,10 @@ float GetDrawFormatStringWidthF(const char *format, ... )
 	int len;
 	va_list arg;
 	va_start(arg,format);
-	vsnprintf(str,1024,format,arg);
+	len = vsnprintf(str,1024,format,arg);
+	if (len < 0) len = 1023;
 	va_end(arg);
-	len = strlen(str);
+	str[1023] = '\0';
 	return GetDrawStringWidthF(str,len);
 }
 
@@ -80,8 +83,9 @@ int GetDrawFormatStringWidth(const char *format, ... )
 	int len;
 	va_list arg;
 	va_start(arg,format);
-	vsnprintf(str,1024,format,arg);
+	len = vsnprintf(str,1024,format,arg);
+	if (len < 0) len = 1023;
 	va_end(arg);
-	len = strlen(str);
+	str[1023] = '\0';
 	return GetDrawStringWidth(str,len);
 }

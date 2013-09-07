@@ -236,6 +236,7 @@ int DrawFormatString(int x,int y,int color,const char *format,...)
 	va_start(arg,format);
 	vsnprintf(strbuf,1024,format,arg);
 	va_end(arg);
+	strbuf[1023] = '\0';
 	return DrawString(x,y,strbuf,color,0);
 }
 
@@ -246,6 +247,7 @@ int	DrawFormatStringToHandle(int x,int y,int color,int handle,const char *format
 	va_start(arg,format);
 	vsnprintf(str,1024,format,arg);
 	va_end(arg);
+	strbuf[1023] = '\0';
 	return DrawStringToHandle(x,y,str,color,handle,0);
 }
 
