@@ -141,8 +141,7 @@ int LoadSoundMem(const char *filename)
 	switch(pHnd->soundDataType) {
 	case DX_SOUNDDATATYPE_MEMNOPRESS:
 		pHnd->memnopress.length = pHnd->avContext.totalSampleNum;
-		int bufsize = dxpSoundCalcBufferSize(&pHnd->avContext, pHnd->memnopress.length);
-		bufsize = ((bufsize / pHnd->avContext.outSampleNum) + 1) * pHnd->avContext.outSampleNum;
+		int bufsize = dxpSoundCalcBufferSize(&pHnd->avContext, pHnd->memnopress.length + pHnd->avContext.outSampleNum);
 		pHnd->memnopress.pcmBuf = (u8*)memalign(64, bufsize);
 		if ( !pHnd->memnopress.pcmBuf ) {
 			dxpSoundCodecEnd(pHnd);
@@ -163,6 +162,7 @@ int LoadSoundMem(const char *filename)
 		}
 		dxpSoundCodecEnd(pHnd);
 		FileRead_close(fileHandle);
+		pHnd->avContext.fileHandle = 0;
 		break;
 
 	case DX_SOUNDDATATYPE_MEMPRESS:

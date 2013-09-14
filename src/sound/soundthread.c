@@ -131,6 +131,7 @@ int dxpSoundThreadFunc_memnopress(SceSize size, void* argp)
 						memnopress_handle[j] = i;
 						memnopress_pos[j] = 0;
 						memnopress_playtype[j] = dxpSoundArray[i].memnopress.cmdplaytype;
+						++dxpSoundArray[i].playing;
 						break;
 					}
 				}
