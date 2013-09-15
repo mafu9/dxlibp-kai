@@ -11,15 +11,17 @@ This library is based on
 * DX Library Portable Kai Ver 3.5 Fixed -- by Dadrfy
 
 
-For more details of based libraries, please see the doc directory.
+For more details of based libraries or Japanese README, please see the doc directory.
 
 
 ### Differences from based libraries
 
-* Support OGG audio format if DXP_BUILDOPTION_USE_LIBOGG is defined
-* malloc and FileRead_* functions are thread-safe
-* Support mutex
-* Enable to open more than 9 files
+* OGG audio format support (if DXP_BUILDOPTION_USE_LIBOGG is defined)
+* malloc/free and FileRead_* functions are thread-safe
+* Grayscale Jpeg support
+* DX_SOUNDDATATYPE_MEMPRESS support
+* Mutex support
+* Support for opening more than 9 files
 
 To use this library,
 
@@ -35,9 +37,7 @@ LIBS += dxlibp.a -lvorbisidec -logg -ljpeg -lpng -lpspgum -lpspgu -lz -lm -lpspr
 LDFLAGS += -Wl,--wrap,malloc -Wl,--wrap,realloc -Wl,--wrap,calloc -Wl,--wrap,memalign -Wl,--wrap,free
 ```
 
-* The following copyright needs to be added:
-
-if DXP_BUILDOPTION_USE_LIBOGG is defined:
+* The following copyright needs to be added if DXP_BUILDOPTION_USE_LIBOGG is defined
 
 ```
 libogg and libvorbisidec
