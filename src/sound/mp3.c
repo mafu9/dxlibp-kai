@@ -75,7 +75,7 @@ int dxpSoundMp3CheckFrameHeader(u8 *buf)
 	if((header & 0xFFE00000) != 0xFFE00000)return -1;
 
 	channel = (header & 0xC0) >> 6;
-	if(channel != 2)return -1; //MediaEngine doesn't support mono sound
+	if(channel == 3)return -1; //MediaEngine doesn't support mono sound
 
 	version = (header & 0x180000) >> 19;
 	switch(version)
