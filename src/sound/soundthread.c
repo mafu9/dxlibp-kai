@@ -63,6 +63,7 @@ int dxpSoundThreadFunc_file(SceSize size, void* argp)
 					dxpSoundCodecSeek(pHnd, pHnd->loopResumePos);
 				} else {
 					dxpSoundCodecSeek(pHnd, 0);
+					while ( sceAudioGetChannelRestLen(channel) > 0 ) sceKernelDelayThread(1000);
 					pHnd->playing = 0;
 				}
 				continue;
