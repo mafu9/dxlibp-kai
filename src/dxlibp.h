@@ -1982,6 +1982,7 @@ int ShowSaveDialog(
 /**
  * ShowSaveDialog関数の為のリソース設定をする
  * DXP内部でバッファを保持するわけではないので、設定した後メモリを開放しないようにしてください
+ * 前回設定したリソースを無効にするにはbufにNULLを指定してください
  *
  * modeに指定可能な値
  * - DXP_SAVE_RESOURCE_ICON1
