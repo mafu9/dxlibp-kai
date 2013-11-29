@@ -13,11 +13,11 @@ unsigned int GetMemoryFreeSize(int fast)
 	{
 		DXPMEMORYLIST *curr = (DXPMEMORYLIST*)malloc(sizeof(DXPMEMORYLIST));
 		if(curr == NULL)break;
+		freeSize += sizeof(DXPMEMORYLIST);
 		curr->buf = malloc(bufSize);
 		if(curr->buf == NULL)
 		{
 			free(curr);
-			freeSize += sizeof(DXPMEMORYLIST);
 			if(bufSize <= minSize) break;
 			bufSize /= 2;
 			continue;
