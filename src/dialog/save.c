@@ -26,6 +26,7 @@ static PspUtilitySavedataListSaveNewData newData;
 int SetSaveResource(int type, void * buf, unsigned int size)
 {
 	if ( type < 0 || type > 3 ) return -1;
+	if ( !buf ) size = 0;
 
 	dxp_save_resource[type].buf = buf;
 	dxp_save_resource[type].bufSize = size;
