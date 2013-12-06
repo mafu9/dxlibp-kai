@@ -363,6 +363,23 @@ int SetLoopSamplePosSoundMem(int looppos,int handle)
 	return 0;
 }
 
+int SetSoundCurrentTime(int time_ms, int handle)
+{
+	DXPSOUNDHANDLE *pHnd;
+	SHND2PTR(handle,pHnd);
+	if(pHnd->playing > 0) return -1;
+	switch(pHnd->soundDataType)
+	{
+	case DX_SOUNDDATATYPE_MEMNOPRESS:
+		return -1;
+	case DX_SOUNDDATATYPE_MEMPRESS:
+	case DX_SOUNDDATATYPE_FILE:
+		return dxpSoundCodecSeek(pHnd, time_ms * pHnd->avContext.sampleRate);
+	default:
+		return -1;
+	}
+}
+
 int GetSoundPlayTime(int handle)
 {
 	DXPSOUNDHANDLE *pHnd;

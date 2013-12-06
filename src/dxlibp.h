@@ -1704,6 +1704,17 @@ int SetLoopPosSoundMem(int looppos_s,int handle);
  * @retval -1 失敗
 */
 int SetLoopSamplePosSoundMem(int looppos,int handle);
+/**
+ * 再生位置を設定する(ほぼ本家互換？)
+ * 
+ * 再生位置をミリ秒単位で設定します。
+ * 再生中やDX_SOUNDDATATYPE_MEMNOPRESSの場合には設定できません。
+ * @param time_ms 再生位置位置（サンプル数単位）
+ * @param handle サウンドハンドル
+ * @retval 0 成功
+ * @retval -1 失敗
+*/
+int SetSoundCurrentTime(int time_ms, int handle);
 /** 
  * LoadSoundMemの挙動を変更します。(本家互換)
  * 
